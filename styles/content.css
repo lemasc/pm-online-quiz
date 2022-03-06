@@ -1,0 +1,71 @@
+.toastui-editor-contents .content ul > li::before,
+.toastui-editor-contents .content ol > li::before {
+  content: unset;
+}
+
+.content-en {
+  font-family: "Lora", ui-serif, Georgia, Cambria, "Times New Roman", Times,
+    serif;
+}
+
+.content {
+  @apply leading-7 space-y-5;
+}
+.content > h1,
+.content > h2 {
+  @apply font-bold py-2;
+}
+
+.content > h1 {
+  @apply text-3xl xl:text-4xl;
+}
+
+.content > h2 {
+  @apply text-2xl;
+}
+
+.content > h3 {
+  @apply text-xl font-bold pb-2 mb-2 border-b border-gray-300;
+}
+
+.content li {
+  @apply ml-4;
+}
+
+.content ol {
+  @apply list-decimal;
+}
+
+.content ul {
+  @apply list-disc;
+}
+
+.content li {
+  @apply py-1 leading-7;
+}
+.content-sublist {
+  @apply ml-2;
+}
+.content-sublist > ul {
+  @apply py-1;
+  list-style-type: circle;
+}
+.content > p,
+.content > .paragraph,
+.indent-inline {
+  line-height: 2rem !important;
+}
+.content.indent > p,
+.content.indent > .paragraph,
+.indent-inline {
+  text-indent: 30px;
+}
+.content a {
+  @apply underline text-blue-600 hover:text-blue-700;
+}
+.content strong {
+  @apply font-bold;
+}
+.content em {
+  @apply font-light;
+}

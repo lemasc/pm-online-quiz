@@ -32,3 +32,15 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# typescript
+*.tsbuildinfo
+
+.vercel
+
+# Sentry
+.sentryclirc
+sentry.properties
+
+# Local Netlify folder
+.netlify

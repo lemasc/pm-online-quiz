@@ -1,0 +1,193 @@
+import Container, { Navbar } from "@/components/container";
+import { useAuth } from "@/context/auth";
+import { ExamLevel, ExamSubmission } from "@/types/exam";
+import { AcademicCapIcon, ClipboardListIcon } from "@heroicons/react/outline";
+
+import { NextPage } from "next";
+import { LogoutIcon } from "@heroicons/react/outline";
+import { useExamList } from "@/shared/examList";
+import { useRouter } from "next/router";
+import { ComponentProps, useCallback } from "react";
+import Link from "next/link";
+import { formatDateTime } from "@/shared/thaiHelpers";
+import axios from "axios";
+
+const Card = ({ href, ...props }: Omit<ComponentProps<"a">, "className">) => {
+  return (
+    <Link href={href as string}>
+      <a
+        className="flex flex-col rounded border bg-white hover:bg-gray-100 p-4 gap-1 w-full md:w-72"
+        {...props}
+      />
+    </Link>
+  );
+};
+
+const List: NextPage = () => {
+  const { user, signOut, metadata } = useAuth();
+  const { data } = useExamList();
+
+  const clearData = useCallback(async () => {
+    if (!data) return;
+    try {
+      data.exam.map((d) => localStorage.removeItem(`exam-${d.id}`));
+      await axios.get("/api/exam/clear");
+    } catch (err) {
+      console.error(err);
+    }
+  }, [data]);
+  return (
+    <Container title="หน้าหลัก">
+      <Navbar title="หน้าหลัก">
+        <button
+          title="ออกจากระบบ"
+          onClick={() => clearData().then(signOut)}
+          className="px-3 py-2 flex flex-wrap justify-center items-center gap-2 rounded-lg bg-quiz-orange-500 text-white hover:bg-quiz-orange-600"
+        >
+          <LogoutIcon className="h-5 w-5 flex-shrink-0" />
+          <span className="text-sm">ออกจากระบบ</span>
+        </button>
+      </Navbar>
+      <div className="p-6 lg:p-8 flex flex-row gap-4 lg:gap-8 items-center bg-white border-b">
+        {user && user.photoURL ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            referrerPolicy="no-referrer"
+            src={user?.photoURL.replace("s96", "s75")}
+            className="rounded-full h-16 w-16"
+            alt="Profile"
+          />
+        ) : (
+          <div className="rounded-full h-16 w-16 bg-gray-300"></div>
+        )}
+        <div className="flex flex-col gap-1">
+          <h1 className="text-xl md:text-2xl font-bold">
+            ยินดีต้อนรับ {metadata?.nameTitle}
+            {metadata?.name}
+          </h1>
+          <span className="text-sm md:text-base text-gray-500">
+            ระดับชั้น ม.{metadata && `${metadata.class}/${metadata?.level}`}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 py-2 divide-y flex-grow">
+        {true && (
+          <section className="p-6 flex flex-col gap-4">
+            <div className="flex flex-row items-center gap-2 text-quiz-blue-500">
+              <AcademicCapIcon className="h-7 w-7" />
+              <h3 className="text-xl font-bold">รายละเอียดโครงการ</h3>
+            </div>
+            <div className="flex flex-row flex-wrap gap-4 font-sarabun items-center">
+              {/* TODO: Add project detail here. */}
+            </div>
+          </section>
+        )}
+        <section className="p-6 flex flex-col gap-4">
+          <div className="flex flex-row items-center gap-2 text-quiz-blue-500">
+            <AcademicCapIcon className="h-7 w-7" />
+            <h3 className="text-xl font-bold">แบบทดสอบที่สามารถทำได้</h3>
+          </div>
+          <h4 className="text-lg font-medium text-quiz-blue-500">มัธยมศึกษา</h4>
+          <div className="flex flex-row flex-wrap gap-4 font-sarabun items-center">
+            {data &&
+              data.exam &&
+              data.exam.length > 0 &&
+              data.exam
+                .filter((d) => d.level === "SECONDARY")
+                .map((d) => (
+                  <Card key={d.id} href={`/exam/${d.id}`}>
+                    <b>
+                      {d.subject} - {ExamLevel[d.level]}
+                    </b>
+                    <span className="text-gray-500 text-sm">
+                      {d.time
+                        ? `ระยะเวลาในการสอบ ${d.time} นาที`
+                        : `ไม่จำกัดระยะเวลาในการสอบ`}
+                    </span>
+                    <span
+                      className={`text-sm ${
+                        d.status === "READY"
+                          ? "text-blue-500"
+                          : d.status === "ON_PROGRESS"
+                          ? "text-green-500"
+                          : "text-red-500"
+                      } font-bold`}
+                    >
+                      {d.status === "READY"
+                        ? "เข้าสู่ระบบการสอบ"
+                        : d.status === "ON_PROGRESS"
+                        ? "กำลังสอบอยู่"
+                        : "สอบแล้ว ไม่สามารถสอบใหม่ได้"}
+                    </span>
+                  </Card>
+                ))}
+          </div>
+          <h4 className="text-lg font-medium text-quiz-blue-500">
+            มัธยมศึกษาปลาย
+          </h4>
+          <div className="flex flex-row flex-wrap gap-4 font-sarabun items-center">
+            {data &&
+              data.exam &&
+              data.exam.length > 0 &&
+              data.exam
+                .filter((d) => d.level === "UPPER_SECONDARY")
+                .map((d) => (
+                  <Card key={d.id} href={`/exam/${d.id}`}>
+                    <b>
+                      {d.subject} - {ExamLevel[d.level]}
+                    </b>
+                    <span className="text-gray-500 text-sm">
+                      {d.time
+                        ? `ระยะเวลาในการสอบ ${d.time} นาที`
+                        : `ไม่จำกัดระยะเวลาในการสอบ`}
+                    </span>
+                    <span
+                      className={`text-sm ${
+                        d.status === "READY"
+                          ? "text-blue-500"
+                          : d.status === "ON_PROGRESS"
+                          ? "text-green-500"
+                          : "text-red-500"
+                      } font-bold`}
+                    >
+                      {d.status === "READY"
+                        ? "เข้าสู่ระบบการสอบ"
+                        : d.status === "ON_PROGRESS"
+                        ? "กำลังสอบอยู่"
+                        : "สอบแล้ว ไม่สามารถสอบใหม่ได้"}
+                    </span>
+                  </Card>
+                ))}
+          </div>
+        </section>
+        <section className="p-6 flex flex-col gap-4">
+          <div className="flex flex-row items-center gap-2 text-quiz-blue-500">
+            <ClipboardListIcon className="h-7 w-7" />
+            <h3 className="text-xl font-bold">ประวัติการทำแบบทดสอบ</h3>
+          </div>
+          <div className="flex flex-row flex-wrap gap-4 font-sarabun items-center">
+            {data &&
+              data.submission &&
+              Object.values(data.submission).length > 0 &&
+              Object.values(data.submission).map((d) => (
+                <Card key={d.id} href={`/exam/${d.id}/report`}>
+                  <b>
+                    {d.subject} - {ExamLevel[d.level]}
+                  </b>
+                  <b className="text-green-600 text-sm">
+                    {d.score} / {d.total} คะแนน
+                  </b>
+                  <span className="text-sm text-gray-500">
+                    {formatDateTime(d.submittedTime)}
+                  </span>
+                </Card>
+              ))}
+          </div>
+        </section>
+      </div>
+    </Container>
+  );
+};
+
+export default List;
