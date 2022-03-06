@@ -74,6 +74,8 @@ export const Timer = React.memo(function Timer({
     return () => {
       timerStore.getState().clearTimer(examId);
     };
+    // We use this to unmounted on page load only, not on deps changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (state === undefined) return null;
