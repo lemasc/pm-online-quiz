@@ -107,7 +107,7 @@ const certificate: NextApiHandler = async (req, res) => {
     doc
       .font("Regular")
       .fontSize(19)
-      .text(thaiDigits(Math.ceil(duration.as("m"))), 433, 332, {
+      .text(thaiDigits(Math.floor(duration.as("m"))), 433, 332, {
         align: "center",
       });
     doc

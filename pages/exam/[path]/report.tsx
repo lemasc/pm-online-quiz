@@ -42,7 +42,7 @@ const List: NextPage = () => {
       .map(([_type, unit]) => {
         const type = _type as DurationUnitType;
         const val = type === "h" ? duration.as(type) : duration.get(type);
-        if (Math.floor(val) !== 0) return `${Math.ceil(val)} ${unit}`;
+        if (Math.floor(val) !== 0) return `${Math.floor(val)} ${unit}`;
       })
       .filter((v) => v !== undefined);
     return output.join(" ");
