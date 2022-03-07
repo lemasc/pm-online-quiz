@@ -20,6 +20,14 @@ const rules = {
 const rulesWithDefault = {
   ...SimpleMarkdown.defaultRules,
   ...rules,
+  link: {
+    ...SimpleMarkdown.defaultRules.link,
+    // We need to allow uses of HTML tags.
+    // This is dangerous, but we are too lazy to define custom inline for every each customization.
+    html: function (node: SimpleMarkdown.SingleASTNode) {
+      return node.content;
+    },
+  },
   text: {
     ...SimpleMarkdown.defaultRules.text,
     // We need to allow uses of HTML tags.

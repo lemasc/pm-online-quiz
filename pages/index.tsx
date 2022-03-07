@@ -16,7 +16,7 @@ const Home: NextPage = () => {
   return (
     <Container>
       <Head>
-        <title>Sign In : {siteName}</title>
+        <title>เข้าสู่ระบบ : {siteName}</title>
       </Head>
       <div className="flex flex-col lg:flex-row h-screen w-full bg-[#e7965b]">
         <div className="lg:relative flex flex-col items-center justify-center flex-grow lg:p-4">
