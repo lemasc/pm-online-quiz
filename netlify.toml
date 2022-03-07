@@ -1,5 +1,8 @@
 [build]
 publish = ".next"
 
+[functions]
+directory = "netlify_functions"
+
 [[plugins]]
 package = "@netlify/plugin-nextjs"
