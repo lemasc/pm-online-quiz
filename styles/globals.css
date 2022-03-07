@@ -152,3 +152,7 @@ table > tbody > tr {
 .quiz-form span.mfrac {
   zoom: 1.25;
 }
+
+input[type="radio"] {
+  @apply text-quiz-blue-500;
+}

@@ -11,6 +11,7 @@ import "swiper/css/virtual";
 
 import "../styles/globals.css";
 import "../styles/content.css";
+import "../styles/print.css";
 
 import MainProvider from "@/context/index";
 

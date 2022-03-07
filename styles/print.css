@@ -1,0 +1,33 @@
+@media print {
+  header,
+  footer,
+  aside,
+  form,
+  … {
+    display: none;
+  }
+  .situation {
+    @apply border border-gray-400 rounded;
+  }
+}
+
+@page: first {
+  margin: 0cm;
+}
+@page: last {
+  margin: 5cm;
+}
+@page: left {
+  margin: 2cm 1.5cm 2cm 2cm;
+}
+@page: right {
+  margin: 2cm 2cm 2cm 1.5cm;
+}
+
+.print .toastui-editor-custom-block-view {
+  padding: 0;
+}
+
+.print div.paragraph {
+  @apply space-y-2;
+}

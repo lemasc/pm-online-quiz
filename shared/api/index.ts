@@ -59,7 +59,7 @@ export const decodeSegmentsMap = <T = string>(
   for (let index = 0; index < target.length; index++) {
     const key = target[index];
     const segments = decodeSegments(hashes, key);
-    const item = !isNaN(parseInt(segments.at(-1) as string))
+    const item = !isNaN(parseInt(segments[segments.length - 1] as string))
       ? (segments.pop() as string)
       : undefined;
     const mapKey = segments.join("/");

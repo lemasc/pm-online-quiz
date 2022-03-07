@@ -14,6 +14,7 @@
     "@netlify/plugin-nextjs": "^4.2.7",
     "@react-pdf/renderer": "^2.1.1",
     "@sentry/nextjs": "^6.18.0",
+    "@tailwindcss/forms": "^0.5.0",
     "@toast-ui/react-editor": "^3.1.2",
     "adm-zip": "^0.5.9",
     "axios": "^0.25.0",
