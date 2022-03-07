@@ -225,11 +225,11 @@ const View: NextPage = () => {
             Authorization: `Bearer ${await user?.getIdToken()}`,
           },
         });
-        /* localStorage.removeItem(`exam-${router.query.path}`);
+        localStorage.removeItem(`exam-${router.query.path}`);
         router.replace({
           pathname: "/exam/[path]/report",
           query: { path: router.query.path },
-        });*/
+        });
       } catch (err) {
         console.error(err);
       }
