@@ -81,8 +81,17 @@ const ExamLoading: NextPage = () => {
       ? examList.exam.find((v) => v.id === router.query.path)
       : undefined;
 
+  const examName = `${currentExam?.subject} - ${
+    currentExam && ExamLevel[currentExam.level]
+  }`;
+
   return (
-    <Container title="กำลังโหลด" fullscreen>
+    <Container
+      title={`${
+        currentExam && !loading ? "คำชี้แจง" : "กำลังโหลด..."
+      } (${examName})`}
+      fullscreen
+    >
       <Navbar backBtn title={"คำชี้แจง"} />
       <div className="flex flex-col items-center flex-grow px-6 py-6 md:py-8">
         {currentExam && !loading ? (

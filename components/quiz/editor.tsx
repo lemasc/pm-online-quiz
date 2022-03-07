@@ -22,13 +22,17 @@ type EditorProps = {
 /**
  * Editor usually changes their value, so we implemented many logics to reduce renders.
  */
-export class Editor extends BaseRenderer {
+export class Editor extends BaseRenderer<{ onReady?: () => void }> {
   editorRef = React.createRef<EditorCore>();
   itemListener?: () => void;
   currentItem = -1;
 
   getContent() {
     return this.editorRef.current?.getMarkdown();
+  }
+
+  getHTML() {
+    return this.editorRef.current?.getHTML();
   }
 
   setContent(content: string) {
@@ -86,6 +90,7 @@ export class Editor extends BaseRenderer {
             /** @ts-expect-error Ref is doing crazy. Use onLoad instead */
             this.editorRef.current = editor;
             this.addAnswerListener(editor);
+            if (this.props.onReady) this.props.onReady();
           }}
           onChange={() => {
             this.setGlobalState();

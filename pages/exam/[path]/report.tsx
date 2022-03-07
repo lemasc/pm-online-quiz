@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import { formatDateTime } from "@/shared/thaiHelpers";
 import dayjs from "dayjs";
 import Duration, { DurationUnitType } from "dayjs/plugin/duration";
+import PieChart from "@/components/PieChart";
 dayjs.extend(Duration);
 
 const units: Partial<Record<DurationUnitType, string>> = {
@@ -28,7 +29,9 @@ const List: NextPage = () => {
   const { data } = useExamList();
 
   const submission =
-    typeof query.path === "string" && data && data.submission[query.path];
+    typeof query.path === "string" && data
+      ? data.submission[query.path]
+      : undefined;
 
   const getDiff = () => {
     if (!submission) return "";
@@ -43,15 +46,20 @@ const List: NextPage = () => {
       .filter((v) => v !== undefined);
     return output.join(" ");
   };
+
+  const examName = `${submission?.subject} - ${
+    submission && ExamLevel[submission.level]
+  }`;
+
   return (
-    <Container title="หน้าหลัก">
+    <Container title={`ผลการทดสอบ (${examName})`}>
       <Navbar title="ผลการทดสอบ" backBtn />
       <div className="flex flex-col items-center px-6 md:px-8 py-8 flex-grow w-full">
         {data && submission && (
           <>
-            <div className="w-full max-w-3xl flex flex-col gap-6">
+            <div className="w-full max-w-2xl flex flex-col gap-6">
               <h2 className="font-bold text-2xl text-center">ผลการทดสอบ</h2>
-              <div className="situation py-4">
+              <div className="situation py-4 font-sarabun">
                 <b>ชื่อผู้ทำแบบทดสอบ:</b>
                 <span>
                   {metadata?.nameTitle}
@@ -63,15 +71,33 @@ const List: NextPage = () => {
                 </span>
                 <b>เวลาเริ่มทำแบบทดสอบ:</b>
                 <span>{formatDateTime(submission.startTime)}</span>
-                <b>เวลาที่ส่งทำแบบทดสอบ:</b>
+                <b>เวลาที่ส่งแบบทดสอบ:</b>
                 <span>{formatDateTime(submission.submittedTime)}</span>
                 <b>ระยะเวลาที่ใช้ไป:</b>
                 <span>{getDiff()}</span>
                 <b>คะแนนที่ได้:</b>
                 <span>
                   {submission.score}/{submission.total} คะแนน (
-                  {(submission.score / submission.total).toFixed(2)}%)
+                  {((submission.score * 100) / submission.total).toFixed(2)}%)
                 </span>
+              </div>
+              <div className="flex flex-col items-center justify-center w-full">
+                <div className="max-w-lg -mt-4 px-4 md:px-0">
+                  <PieChart
+                    data={[
+                      {
+                        title: "ข้อที่ตอบถูกต้อง",
+                        value: submission.score,
+                        color: "#C13C37",
+                      },
+                      {
+                        title: "ข้อที่ตอบผิด",
+                        value: submission.total - submission.score,
+                        color: "#E38627",
+                      },
+                    ]}
+                  />{" "}
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4 items-center justify-center w-full">
                 <button className="px-4 py-3 flex flex-row gap-2 justify-center items-center bg-quiz-orange-500 rounded text-white">

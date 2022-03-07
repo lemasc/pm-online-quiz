@@ -4,7 +4,8 @@ import { ExamStartPayload, GenericExamModel } from "@/types/exam";
 import { nanoid } from "nanoid";
 import { withAPISession } from "@/shared/session";
 import dayjs from "dayjs";
-import { readFile, withFirebase } from "@/shared/api";
+import { HASH_LENGTH, readFile, withFirebase } from "@/shared/api";
+import { itemToCharCode } from "@/shared/api/item";
 
 /**
  * Shuffle Array
@@ -28,13 +29,14 @@ const handler: NextApiHandler<ExamStartPayload> = async (req, res) => {
   );
 
   const hashes = new Map<string, string>();
+  const names = new Map<string, string>();
   const contentSections: string[] = [];
 
   let rootExamData: GenericExamModel | undefined;
 
   const getOrGenerateHash = (id: string) => {
     if (hashes.has(id)) return hashes.get(id) as string;
-    const hash = nanoid(4);
+    const hash = nanoid(HASH_LENGTH);
     hashes.set(id, hash);
     return hash;
   };
@@ -51,7 +53,7 @@ const handler: NextApiHandler<ExamStartPayload> = async (req, res) => {
         ...Object.keys(root.items).map((c) => [
           ...segmentsAsHashes,
           // Instead of using numbers, we convert to letters to make it looks like a wtf code.
-          String.fromCharCode(64 + parseInt(c)),
+          itemToCharCode(c),
         ]),
       ];
     }
@@ -62,6 +64,10 @@ const handler: NextApiHandler<ExamStartPayload> = async (req, res) => {
     // EXTRA: If the current section contains the content field, add it to our array
     if (Boolean(root.content)) {
       contentSections.push(segmentsAsHashes.join("~"));
+    }
+
+    if (root.canShowName) {
+      names.set(segmentsAsHashes.join("~"), root.name);
     }
 
     items = [...items, ...sections];
@@ -80,14 +86,13 @@ const handler: NextApiHandler<ExamStartPayload> = async (req, res) => {
   };
 
   if (req.method !== "GET" || typeof req.query.id !== "string") {
-    res.status(400).send({ data: [] });
+    res.status(400).end();
     return;
   }
   try {
     const data = await processSection(req.query.id);
     // Max internet delay 1500ms
     const startTime = dayjs().add(1500, "milliseconds");
-    req.session.uid = req.token.uid;
     req.session.exam = {
       ...(req.session.exam || {}),
       [req.query.id]: {
@@ -100,6 +105,7 @@ const handler: NextApiHandler<ExamStartPayload> = async (req, res) => {
         endTime: rootExamData?.time
           ? startTime.add(rootExamData.time, "minutes").valueOf()
           : undefined,
+        uid: req.token.uid,
       },
     };
     await req.session.save();
@@ -107,10 +113,11 @@ const handler: NextApiHandler<ExamStartPayload> = async (req, res) => {
       // Data is an obfuscated exam payload that can be send to the client safely.
       data,
       content: contentSections,
+      names: Object.fromEntries(names.entries()),
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ data: [] });
+    res.status(500).end();
   }
 };
 

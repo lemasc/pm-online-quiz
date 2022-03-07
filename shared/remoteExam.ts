@@ -59,8 +59,6 @@ export type ExamState = {
   latency?: number;
 };
 
-const getExamId = (url: string): string => url?.split("/")[3] as string;
-
 const config: SWRConfiguration = {
   onErrorRetry: (
     err: RemoteExamError,

@@ -6,10 +6,12 @@ import { IncomingMessage } from "http";
 import { NextApiRequest, NextApiResponse } from "next";
 import path from "path";
 import { withAPISession } from "../session";
+import { charCodeToItem } from "./item";
 
+export const HASH_LENGTH = 4;
 export const readFile = async <T = any>(...segments: string[]): Promise<T> => {
   /*return JSON.parse(
-    await fs.readFile(path.join("exam", ...segments), {
+    await fs.readFile(path.join("../pm-online-quiz-data", ...segments), {
       encoding: "utf-8",
     })
   );*/
@@ -26,9 +28,9 @@ export const decodeSegments = (
 ) => {
   const splited = segments.split("~");
   return splited.map((value, index) => {
-    if (index === splited.length - 1 && value.length === 1) {
+    if (index === splited.length - 1 && value.length !== HASH_LENGTH) {
       // Last index, return number from String charcode
-      const item = value.charCodeAt(0) - 64;
+      const item = charCodeToItem(value);
       if (isNaN(item) || item < 1)
         throw new Error(`Cannot parse item index char code ${value}.`);
       return item.toString();

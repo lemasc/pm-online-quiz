@@ -5,7 +5,7 @@ import type { ViewerProps as BaseViewerProps } from "@toast-ui/react-editor";
 import dynamic from "next/dynamic";
 
 import { options } from "../options";
-import { quizItemStore, QuizItemState } from "@/shared/store";
+import { quizItemStore, QuizItemState, quizStore } from "@/shared/store";
 import BaseRenderer from "../base";
 import { Oval } from "react-loader-spinner";
 
@@ -72,7 +72,7 @@ export class ViewerClass extends BaseRenderer<ViewerProps> {
 
 const Viewer = React.forwardRef<ViewerClass>(function Viewer(props, ref) {
   const state = quizItemStore();
-  return state.content ? (
+  return state.content && state.item === quizStore.getState().currentItem ? (
     <ViewerClass ref={ref} state={state} />
   ) : (
     <ContentLoading />

@@ -10,7 +10,7 @@ export function formatDateTime(dateTime: ConfigType) {
 
 type DIGITS = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
-const thaiDigits: Record<DIGITS | string, string> = {
+const digits: Record<DIGITS | string, string> = {
   "0": "๐",
   "1": "๑",
   "2": "๒",
@@ -23,11 +23,10 @@ const thaiDigits: Record<DIGITS | string, string> = {
   "9": "๙",
 };
 
-export function convertToThaiDigits(number: number, bypass?: boolean): string {
-  if (bypass) return number.toString();
+export function thaiDigits(number: number | string): string {
   return number
     .toString()
     .split("")
-    .map((v) => thaiDigits[`${v}`])
+    .map((v) => (isNaN(parseInt(v)) ? v : digits[`${v}`]))
     .join("");
 }

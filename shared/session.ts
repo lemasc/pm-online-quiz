@@ -10,8 +10,10 @@ export const sessionOptions = {
   },
 };
 
-export function withSession(handler: GetServerSideProps) {
-  return withIronSessionSsr(handler, sessionOptions);
+export function withSession<
+  P extends { [key: string]: any } = { [key: string]: any }
+>(handler: GetServerSideProps<P>) {
+  return withIronSessionSsr<P>(handler, sessionOptions);
 }
 
 export function withAPISession(handler: NextApiHandler) {
@@ -20,7 +22,6 @@ export function withAPISession(handler: NextApiHandler) {
 
 declare module "iron-session" {
   interface IronSessionData {
-    uid?: string;
     exam?: Record<string, ExamSessionData>;
   }
 }

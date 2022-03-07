@@ -73,14 +73,14 @@ const View: NextPage = () => {
   // Error Handling
   const lastToastId = useRef<string>();
   useEffect(() => {
-    if (serializeToast(error) === lastToastId.current) {
+    if (serializeToast(error) !== lastToastId.current) {
       toast.dismiss(lastToastId.current);
     }
     if (!error) return;
     if (error.isTimeEnd) return;
     //if (error.isRecoverable) {
     setTimeout(
-      () =>
+      () => {
         toast.error(
           <>
             <span className="text-red-600 text-base font-medium">
@@ -100,7 +100,10 @@ const View: NextPage = () => {
             draggable: false,
             closeOnClick: false,
           }
-        ),
+        );
+        lastToastId.current = serializeToast(error);
+      },
+
       100
     );
     // }
@@ -222,11 +225,11 @@ const View: NextPage = () => {
             Authorization: `Bearer ${await user?.getIdToken()}`,
           },
         });
-        localStorage.removeItem(`exam-${router.query.path}`);
+        /* localStorage.removeItem(`exam-${router.query.path}`);
         router.replace({
           pathname: "/exam/[path]/report",
           query: { path: router.query.path },
-        });
+        });*/
       } catch (err) {
         console.error(err);
       }
@@ -302,23 +305,44 @@ const View: NextPage = () => {
     </div>
   );
 
+  const getSectionNames = useCallback(() => {
+    if (!payload.current) return [];
+    const name = payload.current.data[index - 1];
+    if (!name) return [];
+    const segments = name.split("~").slice(0, -1);
+    return Object.entries(payload.current.names)
+      .filter(([key]) => {
+        for (let i = 0; i < segments.length; i++) {
+          if (key === segments.slice(0, i + 1).join("~")) return true;
+        }
+        return false;
+      })
+      .map(([k, v]) => v);
+  }, [index]);
+
   const currentExam =
     examList && typeof router.query.path === "string"
       ? examList.exam.find((v) => v.id === router.query.path)
       : undefined;
+  const examName = `${currentExam?.subject} - ${
+    currentExam && ExamLevel[currentExam.level]
+  }`;
 
   return (
-    <Container title="กำลังโหลด" fullscreen scrollable={false}>
+    <Container
+      title={`${
+        index === 0 ? "กำลังโหลด..." : `ข้อที่ ${index}`
+      } (${examName})`}
+      fullscreen
+      scrollable={false}
+    >
       <Navbar
         backBtn
         title={
           <div className="flex flex-col">
-            <span>
-              {currentExam?.subject} -{" "}
-              {currentExam && ExamLevel[currentExam.level]}
-            </span>
+            <span>{examName}</span>
             <span className="text-sm font-normal text-gray-200">
-              Part I: Listening and Speaking
+              {getSectionNames().join(" - ")}
             </span>
           </div>
         }
@@ -354,7 +378,7 @@ const View: NextPage = () => {
           <Scrollable content={contentData !== undefined}>
             <div className="flex flex-row items-center py-2">
               <h3 className="font-bold text-lg text-quiz-blue-500 flex-grow flex-shrink-0">
-                {index === 0 ? "คำชี่้แจง" : index}.
+                {index === 0 ? "กำลังโหลด..." : `${index}.`}
               </h3>
               <div>
                 <Controls min />

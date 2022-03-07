@@ -11,13 +11,17 @@ const checkValidity: ExamApiHandler<ExamQuery, ExamStartPayload> = async (
   req,
   res
 ) => {
-  if (req.session.uid !== req.token.uid) {
+  if (req.session.exam?.[req.query.id].uid !== req.token.uid) {
     return void res.status(403).end();
   }
   try {
     decodeSegmentsMap(req.examData.hash, req.body.data);
-    if (req.body.content)
+    if (req.body.content) {
       decodeSegmentsMap(req.examData.hash, req.body.content);
+    }
+    if (req.body.names) {
+      decodeSegmentsMap(req.examData.hash, req.body.names);
+    }
     // Additionally, check the answers object?
     if (req.body.answers) {
       Object.entries(req.body.answers).forEach(([k, v]) => {

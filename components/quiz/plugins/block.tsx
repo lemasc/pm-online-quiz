@@ -73,7 +73,7 @@ export const customTextPlugin: PluginFn = () => {
               "rounded",
               "px-4",
               "py-4",
-              "my-6",
+              "my-4",
             ],
           },
           ...nodes,

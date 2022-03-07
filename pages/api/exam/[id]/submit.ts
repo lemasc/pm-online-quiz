@@ -18,7 +18,7 @@ type Answer = {
 const db = admin.firestore();
 
 const submit: ExamApiHandler<ExamQuery, ExamSubmitBody> = async (req, res) => {
-  if (req.token.uid !== req.session.uid) {
+  if (req.token.uid !== req.session.exam?.[req.query.id].uid) {
     return void res.status(403).end();
   }
   try {

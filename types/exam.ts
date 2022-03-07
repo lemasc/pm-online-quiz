@@ -43,11 +43,13 @@ export type ExamSessionData = {
   hash: Record<string, string>;
   startTime: number;
   endTime?: number;
+  uid: string;
 };
 
 export type ExamStartPayload = {
   data: string[];
-  content?: string[];
+  content: string[];
+  names: Record<string, string>;
   answers?: Record<string, number>;
 };
 

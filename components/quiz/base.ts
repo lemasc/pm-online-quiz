@@ -7,7 +7,7 @@ type MarkdownPreview = {
   previewContent: HTMLElement;
 };
 
-export default class BaseRenderer<T = {}> extends React.Component<T> {
+export default class BaseRenderer<P = {}> extends React.Component<P> {
   private targetEl?: HTMLElement;
   addAnswerListener(viewer: Viewer) {
     const preview = (viewer as any).preview as MarkdownPreview;

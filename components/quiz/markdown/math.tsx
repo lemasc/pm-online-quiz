@@ -6,6 +6,7 @@ function renderMath(str: string) {
   try {
     return katex.renderToString(str, {
       displayMode: false,
+      strict: false,
     });
   } catch (err) {
     if (err instanceof katex.ParseError) {

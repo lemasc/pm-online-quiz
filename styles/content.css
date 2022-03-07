@@ -69,3 +69,7 @@
 .content em {
   @apply font-light;
 }
+
+.print-preview .toastui-editor-custom-block-view {
+  padding: 0;
+}

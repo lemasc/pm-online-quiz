@@ -58,9 +58,10 @@ export const Timer = React.memo(function Timer({
     timerRef.current = setInterval(() => {
       timerStore.getState().set(examId, (state) => {
         const timePending = (state?.timePending as number) - 1000;
+        console.log(timePending);
         return {
           ...state,
-          success: timePending === 0,
+          timeUp: timePending < 0,
           timePending,
         };
       });
@@ -81,7 +82,7 @@ export const Timer = React.memo(function Timer({
   if (state === undefined) return null;
 
   const formatTime = () => {
-    const time = dayjs.duration(state);
+    const time = dayjs.duration(state > 0 ? state : 0);
     const result = [time.get("h"), time.get("m"), time.get("s")];
     return result.map((v) => Math.floor(v).toString().padStart(2, "0"));
   };
