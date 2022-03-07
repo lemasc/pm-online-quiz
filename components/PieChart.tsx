@@ -29,41 +29,43 @@ function PieChart(props: Props) {
       segmentsShift={1}
       // label={({ dataEntry }) => Math.round(dataEntry.percentage) + "%"}
       animate
-      label={({ x, y, dx, dy, dataEntry }) => (
-        <>
-          <text
-            x={x}
-            y={y}
-            dx={dx + 2}
-            dy={dy - 1}
-            dominantBaseline="central"
-            textAnchor="middle"
-            style={{
-              fill: "#fff",
-              pointerEvents: "none",
-              fontWeight: "bold",
-              fontSize: "8px",
-            }}
-          >
-            {Math.round(dataEntry.percentage) + "%"}
-          </text>
-          <text
-            x={x}
-            y={y}
-            dx={dx + 2}
-            dy={dy + 8}
-            dominantBaseline="central"
-            textAnchor="middle"
-            style={{
-              fill: "#fff",
-              pointerEvents: "none",
-              fontSize: "4px",
-            }}
-          >
-            {dataEntry.title}
-          </text>
-        </>
-      )} /*
+      label={({ x, y, dx, dy, dataEntry }) =>
+        dataEntry.percentage >= 20 ? (
+          <>
+            <text
+              x={x}
+              y={y}
+              dx={dx + (dataEntry.percentage > 20 ? 2 : 4)}
+              dy={dy + (dataEntry.percentage > 20 ? -1 : -5)}
+              dominantBaseline="central"
+              textAnchor="middle"
+              style={{
+                fill: "#fff",
+                pointerEvents: "none",
+                fontWeight: "bold",
+                fontSize: "8px",
+              }}
+            >
+              {Math.round(dataEntry.percentage) + "%"}
+            </text>
+            <text
+              x={x}
+              y={y}
+              dx={dx + (dataEntry.percentage > 20 ? 2 : 4)}
+              dy={dy + (dataEntry.percentage > 20 ? 8 : 4)}
+              dominantBaseline="central"
+              textAnchor="middle"
+              style={{
+                fill: "#fff",
+                pointerEvents: "none",
+                fontSize: "4px",
+              }}
+            >
+              {dataEntry.title}
+            </text>
+          </>
+        ) : null
+      } /*
       labelStyle={{
         fill: "#fff",
         opacity: 0.75,

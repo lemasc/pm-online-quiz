@@ -1,4 +1,4 @@
-import { withFirebase, readFile } from "@/shared/api";
+import { withFirebase, readFile, withDocumentDatesParsed } from "@/shared/api";
 import admin from "@/shared/firebase-admin";
 import { withAPISession } from "@/shared/session";
 import {
@@ -7,28 +7,7 @@ import {
   ExamSubmission,
   SubmissionAPIItem,
 } from "@/types/exam";
-import { DocumentData } from "firebase-admin/firestore";
 import { NextApiHandler } from "next";
-
-export function withDocumentDatesParsed<Data extends DocumentData>(
-  data: Data,
-  parseDates?: (keyof Data)[]
-): Data {
-  const doc = { ...data };
-  parseDates?.forEach((dateField) => {
-    if (typeof dateField !== "string") return;
-
-    const unparsedDate = doc[dateField];
-    if (unparsedDate) {
-      const parsedDate: Date | undefined = unparsedDate.toDate?.();
-      if (parsedDate) {
-        (doc as any)[dateField] = parsedDate;
-      }
-    }
-  });
-
-  return doc;
-}
 
 const db = admin.firestore();
 

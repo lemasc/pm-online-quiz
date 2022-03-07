@@ -12,7 +12,7 @@ import { auth } from "../shared/firebase";
 import { useRouter } from "next/router";
 import { useDocument, Document } from "swr-firestore-v9";
 
-type UserMetadata = {
+export type UserMetadata = {
   studentId: number;
   studentNo: number;
   nameTitle: string;

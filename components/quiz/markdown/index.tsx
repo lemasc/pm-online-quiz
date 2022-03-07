@@ -56,7 +56,7 @@ export const inlinePlugin: PluginFn = () => {
 };
 
 /**
- * Standalone markdown parser that both handle CommonMark specs and out custom rules.
+ * Standalone markdown parser that both handle CommonMark specs and our custom rules.
  */
 export const markdown = (content: string): string => {
   const rawBuiltParser = SimpleMarkdown.parserFor(rulesWithDefault);

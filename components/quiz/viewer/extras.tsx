@@ -58,7 +58,6 @@ export const Timer = React.memo(function Timer({
     timerRef.current = setInterval(() => {
       timerStore.getState().set(examId, (state) => {
         const timePending = (state?.timePending as number) - 1000;
-        console.log(timePending);
         return {
           ...state,
           timeUp: timePending < 0,

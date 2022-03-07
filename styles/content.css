@@ -11,20 +11,20 @@
 .content {
   @apply leading-7 space-y-5;
 }
-.content > h1,
-.content > h2 {
+.content h1,
+.content h2 {
   @apply font-bold py-2;
 }
 
-.content > h1 {
-  @apply text-3xl xl:text-4xl;
+.content h1 {
+  @apply text-3xl;
 }
 
-.content > h2 {
+.content h2 {
   @apply text-2xl;
 }
 
-.content > h3 {
+.content h3 {
   @apply text-xl font-bold pb-2 mb-2 border-b border-gray-300;
 }
 

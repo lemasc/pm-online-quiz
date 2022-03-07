@@ -1,26 +1,12 @@
 import { ExamSessionData } from "@/types/exam";
-import axios from "axios";
 import dayjs from "dayjs";
-import fs from "fs/promises";
 import { IncomingMessage } from "http";
 import { NextApiRequest, NextApiResponse } from "next";
-import path from "path";
+
 import { withAPISession } from "../session";
 import { charCodeToItem } from "./item";
 
 export const HASH_LENGTH = 4;
-export const readFile = async <T = any>(...segments: string[]): Promise<T> => {
-  /*return JSON.parse(
-    await fs.readFile(path.join("../pm-online-quiz-data", ...segments), {
-      encoding: "utf-8",
-    })
-  );*/
-  return axios
-    .get<T>(`/${segments.join("/")}`, {
-      baseURL: process.env.DATA_URL,
-    })
-    .then((v) => v.data);
-};
 
 export const decodeSegments = (
   hash: ExamSessionData["hash"],
@@ -170,3 +156,4 @@ export function withExamSession<
 }
 
 export * from "./withFirebase";
+export * from "./base";

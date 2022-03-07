@@ -1,11 +1,37 @@
 import { NextApiHandler } from "next";
 import admin from "../firebase-admin";
 import { auth } from "firebase-admin";
+import { ExamModel, ExamSubmission } from "@/types/exam";
+import { readFile, withDocumentDatesParsed } from "./base";
 
 declare module "next" {
   interface NextApiRequest {
     token: auth.DecodedIdToken;
   }
+}
+
+export async function getSubmission(token: string, id: string) {
+  const user = await admin.auth().verifyIdToken(token);
+  const submission = await admin
+    .firestore()
+    .collection("users")
+    .doc(user.uid)
+    .collection("submissions")
+    .doc(id)
+    .get();
+  if (!submission.exists) throw new Error("Submission not found.");
+  const submissionData = submission.data() as ExamSubmission;
+  const examData = (await readFile(id, "index.json")) as ExamModel;
+  return {
+    user,
+    data: {
+      ...examData,
+      ...withDocumentDatesParsed(submissionData, [
+        "startTime",
+        "submittedTime",
+      ]),
+    },
+  };
 }
 
 export const withFirebase = (handler: NextApiHandler): NextApiHandler => {

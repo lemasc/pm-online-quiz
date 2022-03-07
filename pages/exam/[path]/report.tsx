@@ -16,6 +16,7 @@ import { formatDateTime } from "@/shared/thaiHelpers";
 import dayjs from "dayjs";
 import Duration, { DurationUnitType } from "dayjs/plugin/duration";
 import PieChart from "@/components/PieChart";
+import Link from "next/link";
 dayjs.extend(Duration);
 
 const units: Partial<Record<DurationUnitType, string>> = {
@@ -24,7 +25,7 @@ const units: Partial<Record<DurationUnitType, string>> = {
   s: "วินาที",
 };
 const List: NextPage = () => {
-  const { metadata } = useAuth();
+  const { user, metadata } = useAuth();
   const { push, query } = useRouter();
   const { data } = useExamList();
 
@@ -99,12 +100,32 @@ const List: NextPage = () => {
                   />{" "}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4 items-center justify-center w-full">
-                <button className="px-4 py-3 flex flex-row gap-2 justify-center items-center bg-quiz-orange-500 rounded text-white">
+              <div className="grid sm:grid-cols-2 gap-4 items-center justify-center w-full">
+                <button
+                  onClick={() =>
+                    user?.getIdToken().then((token) =>
+                      push({
+                        pathname: "/exam/[path]/printout",
+                        query: { path: query.path, token },
+                      })
+                    )
+                  }
+                  className="px-4 py-3 flex flex-row gap-2 justify-center items-center bg-quiz-orange-500 hover:bg-quiz-orange-600 rounded text-white"
+                >
                   <PrinterIcon className="h-6 w-6" />
                   พิมพ์สำเนาข้อสอบ
                 </button>
-                <button className="px-4 py-3 flex flex-row gap-2 justify-center items-center  bg-green-600 rounded text-white">
+                <button
+                  onClick={() =>
+                    user?.getIdToken().then((token) =>
+                      push({
+                        pathname: "/api/exam/[path]/certificate",
+                        query: { path: query.path, token },
+                      })
+                    )
+                  }
+                  className="px-4 py-3 flex flex-row gap-2 justify-center items-center bg-green-600 hover:bg-green-700 rounded text-white"
+                >
                   <DownloadIcon className="h-6 w-6" />
                   ดาวน์โหลดเกียรติบัตร (PDF)
                 </button>
