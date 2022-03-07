@@ -1,12 +1,10 @@
+import { useState, useEffect, useContext, createContext, useRef } from "react";
 import {
-  useState,
-  useEffect,
-  useContext,
-  createContext,
-  ReactNode,
-  useRef,
-} from "react";
-import { GoogleAuthProvider, signInWithPopup, User } from "firebase/auth";
+  getRedirectResult,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  User,
+} from "firebase/auth";
 
 import { auth } from "../shared/firebase";
 import { useRouter } from "next/router";
@@ -54,7 +52,7 @@ export function useProvideAuth(): IAuthContext {
     provider.setCustomParameters({
       hd: "wpm.pnru.ac.th",
     });
-    await signInWithPopup(auth, provider);
+    await signInWithRedirect(auth, provider);
   };
 
   const signOut = async (): Promise<void> => {
@@ -92,6 +90,10 @@ export function useProvideAuth(): IAuthContext {
       }
     });
   }, [user, router]);
+
+  useEffect(() => {
+    getRedirectResult(auth);
+  }, []);
 
   return {
     user,
