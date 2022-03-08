@@ -1,22 +1,15 @@
-import Container, { Navbar } from "@/components/container";
+import Container, { Navbar, withExamName } from "@/components/container";
 import { useAuth } from "@/context/auth";
-import { ExamLevel, ExamSubmission } from "@/types/exam";
-import {
-  AcademicCapIcon,
-  ClipboardListIcon,
-  DownloadIcon,
-  PrinterIcon,
-} from "@heroicons/react/outline";
+import { ExamLevel } from "@/types/exam";
+import { DownloadIcon, PrinterIcon } from "@heroicons/react/outline";
 
 import { NextPage } from "next";
-import { LogoutIcon } from "@heroicons/react/outline";
-import { useExamList } from "@/shared/examList";
+import { useCurrentSubmission } from "@/shared/examList";
 import { useRouter } from "next/router";
 import { formatDateTime } from "@/shared/thaiHelpers";
 import dayjs from "dayjs";
 import Duration, { DurationUnitType } from "dayjs/plugin/duration";
 import PieChart from "@/components/PieChart";
-import Link from "next/link";
 dayjs.extend(Duration);
 
 const units: Partial<Record<DurationUnitType, string>> = {
@@ -24,15 +17,10 @@ const units: Partial<Record<DurationUnitType, string>> = {
   m: "นาที",
   s: "วินาที",
 };
-const List: NextPage = () => {
+const ExamReport: NextPage = () => {
   const { user, metadata } = useAuth();
   const { push, query } = useRouter();
-  const { data } = useExamList();
-
-  const submission =
-    typeof query.path === "string" && data
-      ? data.submission[query.path]
-      : undefined;
+  const { data: submission } = useCurrentSubmission();
 
   const getDiff = () => {
     if (!submission) return "";
@@ -48,15 +36,11 @@ const List: NextPage = () => {
     return output.join(" ");
   };
 
-  const examName = `${submission?.subject} - ${
-    submission && ExamLevel[submission.level]
-  }`;
-
   return (
-    <Container title={`ผลการทดสอบ (${examName})`}>
+    <Container title={withExamName("ผลการทดสอบ", submission)}>
       <Navbar title="ผลการทดสอบ" backBtn />
       <div className="flex flex-col items-center px-6 md:px-8 py-8 flex-grow w-full">
-        {data && submission && (
+        {submission && (
           <>
             <div className="w-full max-w-2xl flex flex-col gap-6">
               <h2 className="font-bold text-2xl text-center">ผลการทดสอบ</h2>
@@ -103,12 +87,13 @@ const List: NextPage = () => {
               <div className="grid sm:grid-cols-2 gap-4 items-center justify-center w-full">
                 <button
                   onClick={() =>
-                    user?.getIdToken().then((token) =>
-                      push({
-                        pathname: "/exam/[path]/printout",
-                        query: { path: query.path, token },
-                      })
-                    )
+                    push({
+                      pathname: "/exam/[path]/printout",
+                      query: {
+                        path: query.path,
+                        token: submission.downloadToken,
+                      },
+                    })
                   }
                   className="px-4 py-3 flex flex-row gap-2 justify-center items-center bg-quiz-orange-500 hover:bg-quiz-orange-600 rounded text-white"
                 >
@@ -117,12 +102,13 @@ const List: NextPage = () => {
                 </button>
                 <button
                   onClick={() =>
-                    user?.getIdToken().then((token) =>
-                      push({
-                        pathname: "/api/exam/[path]/certificate",
-                        query: { path: query.path, token },
-                      })
-                    )
+                    push({
+                      pathname: "/api/exam/[path]/certificate",
+                      query: {
+                        path: query.path,
+                        token: submission.downloadToken,
+                      },
+                    })
                   }
                   className="px-4 py-3 flex flex-row gap-2 justify-center items-center bg-green-600 hover:bg-green-700 rounded text-white"
                 >
@@ -138,4 +124,4 @@ const List: NextPage = () => {
   );
 };
 
-export default List;
+export default ExamReport;

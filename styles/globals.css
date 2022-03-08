@@ -48,11 +48,11 @@ a {
 }
 
 .form-container {
-  @apply gap-3 sm:gap-4 sm:grid flex flex-col justify-center;
+  @apply gap-3 sm:gap-4 sm:grid print:grid flex flex-col justify-center;
   grid-template-columns: max-content 1fr;
 }
 .form-container > *:nth-child(odd) {
-  @apply md:mr-8;
+  @apply md:mr-8 print:mr-10;
 }
 .form-container > *:nth-child(even) {
   @apply w-full;

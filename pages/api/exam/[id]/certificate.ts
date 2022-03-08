@@ -1,5 +1,5 @@
 import PDFDocument from "pdfkit";
-import { NextApiHandler, NextApiRequest } from "next";
+import { NextApiHandler } from "next";
 import { nanoid } from "nanoid";
 import { siteName } from "@/shared/constants";
 import { thaiDigits } from "@/shared/thaiHelpers";
@@ -47,31 +47,17 @@ const certificate: NextApiHandler = async (req, res) => {
     });
 
     const {
-      data: { level, score, total, name, subject, submittedTime, startTime },
-      user,
+      submission: { score, total, startTime, submittedTime },
+      exam: { level, subject },
+      metadata,
     } = await getSubmission(token, id);
-    const metadataDoc = await admin
-      .firestore()
-      .collection("users")
-      .doc(user.uid)
-      .get();
-
-    if (!metadataDoc.exists) {
-      return void res.status(401).end();
-    }
-
-    const metadata = metadataDoc.data() as UserMetadata;
 
     doc.registerFont("Regular", file("THSarabunNew"));
     doc.registerFont("Bold", file("THSarabunNewBold"));
 
     const isUpper = level === "UPPER_SECONDARY";
 
-    const fileName: keyof typeof statics = isUpper
-      ? "cert_upper"
-      : "cert_secondary";
-
-    doc.image(file(fileName), 0, 0, {
+    doc.image(file(isUpper ? "cert_upper" : "cert_secondary"), 0, 0, {
       width: Math.ceil(doc.page.width),
       height: Math.ceil(doc.page.height),
     });
@@ -127,7 +113,7 @@ const certificate: NextApiHandler = async (req, res) => {
     res.setHeader("Content-Transfer-Encoding", "Binary");
     res.setHeader(
       "Content-disposition",
-      `attachment; filename=QuizCert_${dayjs().unix()}.pdf`
+      `attachment; filename=QuizCert_${metadata.studentId}_${id}.pdf`
     );
     doc.pipe(res);
   } catch (err) {

@@ -1,36 +1,37 @@
 import { GetServerSideProps } from "next";
-import { ExamLevel, GenericExamModel as BaseExamModel } from "@/types/exam";
+import {
+  ExamLevel,
+  GenericExamModel as BaseExamModel,
+  SubmissionAPIItem,
+} from "@/types/exam";
 import { decodeSegmentsMap, getSubmission, readFile } from "@/shared/api";
-import { QuizItem } from "../../../types";
-import { useEffect, useRef, useState } from "react";
-import Editor from "@/components/quiz/editor";
-import { markdown } from "@/components/quiz/markdown";
-import { QuizItemState, quizItemStore } from "@/shared/store";
+import { useState } from "react";
 import { ChevronLeftIcon, PrinterIcon } from "@heroicons/react/outline";
 import { useHistoryRouter } from "@/context/history";
 import { ContentLoading } from "@/components/quiz/viewer";
-import { useExamList } from "@/shared/examList";
 import { useAuth } from "@/context/auth";
-
-type Answer = {
-  item: string;
-  index: number;
-  selected: number;
-};
-
-type GenericExamModel = Partial<Pick<BaseExamModel, "content" | "name">>;
-
-type Result = GenericExamModel & {
-  items: (QuizItem & Omit<Answer, "item">)[];
-};
-
-type ProcessedResult = Omit<Result, "items"> & {
-  items: string[];
-};
+import Head from "next/head";
+import dayjs from "dayjs";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+import th from "dayjs/locale/th";
+import {
+  ExportDataGenerator,
+  ExportDataOutput,
+  ExportExamModel,
+  Result,
+} from "@/components/quiz/export";
+dayjs.extend(localizedFormat);
+dayjs.locale(th);
 
 type Props = {
-  path: string;
   results: Result[];
+  submission: Pick<
+    SubmissionAPIItem,
+    "subject" | "level" | "id" | "score" | "total"
+  > & {
+    submittedTime: number;
+  };
+  name: string;
 };
 
 export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
@@ -44,7 +45,9 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
     }
 
     const {
-      data: { answers: _answers, hash },
+      submission: { answers: _answers, hash, submittedTime, score, total },
+      exam: { level, subject },
+      metadata,
     } = await getSubmission(token, id);
     if (!_answers) {
       return {
@@ -65,7 +68,7 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
 
     const items = await Promise.all(
       Array.from(map.entries()).map(async ([key, entries]) => {
-        let contentData: string | undefined = "";
+        let contentData: string | undefined;
         const { items, name, canShowName, content } =
           await readFile<BaseExamModel>(id as string, key, "index.json");
 
@@ -81,7 +84,7 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
             ...(canShowName ? { name } : {}),
             items: entries.map((ans) => ({
               selected: ans.selected ?? -1,
-              content: `**${ans.index + 1}.**\n${items?.[ans.item]?.content}`,
+              content: items?.[ans.item]?.content ?? "",
             })),
           },
         ];
@@ -92,11 +95,11 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
     const itemsMap = new Map<string, Result>(items as never);
     // But we don't know any parent sections. Let's get their parents and fetch more data.
     const getParentKey = (key: string) => key.split("/").slice(0, 1);
-    // Map parent keys to a set to remove duplicate values
+    // Map parent keys to a set to remove duplicate values and prevent unneccesary fetches.
     const sectionsSet = new Set<string>(
       Array.from(map.keys()).map((key) => getParentKey(key).join("/"))
     );
-    const sections = new Map<string, GenericExamModel>();
+    const sections = new Map<string, ExportExamModel>();
     await Promise.all(
       Array.from(sectionsSet.values()).map(async (key) => {
         const parentKey = getParentKey(key).join("/");
@@ -123,7 +126,15 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
     return {
       props: {
         results: Array.from(results.values()),
-        path: id,
+        submission: {
+          id,
+          subject,
+          level,
+          score,
+          total,
+          submittedTime: submittedTime.valueOf(),
+        },
+        name: metadata.nameTitle + metadata.name,
       },
     };
   } catch (err) {
@@ -136,79 +147,34 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
   }
 };
 
-const delay = (time: number) =>
-  new Promise<void>((resolve) => setTimeout(() => resolve(), time));
-
-export default function PrintPage({ results, path }: Props) {
+export default function PrintPage({ results, submission, name }: Props) {
   const { metadata } = useAuth();
-  const { data } = useExamList();
-  const [capture, setCapture] = useState(false);
-  const [ready, setReady] = useState(false);
-  const editorRef = useRef<Editor | null>();
-  const isProcessing = useRef(false);
-  const dataRef = useRef<ProcessedResult[]>();
+  const [output, setOutput] = useState<Result[]>();
   const { back } = useHistoryRouter();
-
-  useEffect(() => {
-    if (!capture || isProcessing.current || dataRef.current) return;
-
-    const html = async (item: QuizItemState) => {
-      // Set internal state first
-      quizItemStore.setState(item);
-      await delay(100);
-      editorRef.current?.setContent(item.content);
-      if (item.selected && item.selected !== -1)
-        editorRef.current?.setAnswerValue(item.selected);
-      await delay(100);
-      return markdown(editorRef.current?.getHTML() ?? "");
-    };
-
-    (async () => {
-      isProcessing.current = true;
-      dataRef.current = results.slice() as any;
-      let item = 0;
-      for (let i = 0; i < results.length; i++) {
-        if (dataRef.current![i].content) {
-          dataRef.current![i].content = await html({
-            content: dataRef.current![i].content ?? "",
-            selected: -1,
-            item,
-            startIndex: item,
-          });
-        }
-        if (results[i].items) {
-          for (let e = 0; e < results[i].items.length; e++) {
-            dataRef.current![i].items[e] =
-              (await html({ ...results[i].items[e], item })) ?? "";
-            item++;
-          }
-        }
-      }
-      setCapture(false);
-      setReady(true);
-    })();
-  }, [capture, results]);
-
-  const submission = data ? data.submission[path] : undefined;
 
   return (
     <main className="flex flex-col print min-h-screen">
+      <Head>
+        <title>
+          {output ? "สำเนาข้อสอบ" : "กำลังโหลด..."} ( {submission.subject} -{" "}
+          {ExamLevel[submission.level]})
+        </title>
+      </Head>
       <header className="p-6 font-prompt sticky top-0 bg-quiz-orange-500 text-white shadow z-10 ">
         <div className="flex flex-row gap-2 flex-grow items-center">
-          {ready && (
-            <button onClick={() => back(`/exam/${path}/report`)}>
+          {output && (
+            <button onClick={() => back(`/exam/${submission.id}/report`)}>
               <ChevronLeftIcon className="h-6 w-6" />
             </button>
           )}
           <h1 className="font-bold text-lg flex-grow">สำเนาข้อสอบ</h1>
-          {ready && (
+          {output && (
             <button
-              title="ออกจากระบบ"
+              title="พิมพ์"
               onClick={() => {
-                console.log("Print");
                 window.print();
               }}
-              className="px-4 py-2 flex flex-wrap justify-center items-center gap-2 rounded-lg bg-quiz-blue-500 text-white hover:bg-quiz-blue-600"
+              className="px-4 py-2 flex flex-wrap justify-center items-center gap-2 rounded-lg bg-quiz-blue-400 text-white hover:bg-quiz-blue-500"
             >
               <PrinterIcon className="h-5 w-5 flex-shrink-0" />
               <span className="text-sm">พิมพ์</span>
@@ -216,60 +182,42 @@ export default function PrintPage({ results, path }: Props) {
           )}
         </div>
       </header>
-      {!(ready && submission) ? (
+      {!(output && submission) ? (
         <>
           <div className="flex flex-col font-prompt items-center justify-center flex-grow h-full">
             <ContentLoading />
             <span>กำลังจัดเตรียมไฟล์ กรุณารอสักครู่...</span>
           </div>
           {metadata?.exists && (
-            <div className="hidden">
-              <Editor
-                ref={(ref) => (editorRef.current = ref)}
-                onReady={() => setCapture(true)}
-              />
-            </div>
+            <ExportDataGenerator hide results={results} onSuccess={setOutput} />
           )}
         </>
       ) : (
-        <div className="flex-grow p-4 md:p-8 lg:p-12 bg-gray-400 print:p-0 print:bg-white">
-          <article className="font-sarabun content bg-white p-10 lg:p-14 print:p-0">
-            <div className="flex flex-row gap-4 items-center pt-8">
-              <h1 className="flex-grow">
-                {submission.subject} - {ExamLevel[submission.level]}
-              </h1>
-              <div className="rounded font-bold text-lg bg-quiz-blue-400 px-4 py-2 text-white">
+        <div className="flex-grow flex flex-col items-center p-4 md:p-8 lg:p-12 bg-gray-400 print:p-0 print:bg-white">
+          <article className="font-sarabun content bg-white p-10 lg:p-14 print:p-0 max-w-5xl print:max-w-none">
+            <div className="flex flex-row gap-4 items-start pt-4">
+              <div className="flex flex-grow flex-col gap-4">
+                <h1 className="flex-grow text-quiz-blue-600">
+                  {submission.subject} - {ExamLevel[submission.level]}
+                </h1>
+                <div className="form-container">
+                  <b>ชื่อผู้ทำแบบทดสอบ:</b>
+                  <span>{name}</span>
+                  <b>เวลาที่ส่งแบบทดสอบ:</b>
+                  <span>
+                    {dayjs(submission.submittedTime).format("LLL")} น.
+                  </span>
+                </div>
+              </div>
+              <div className="rounded font-bold text-lg  bg-quiz-blue-400 px-4 py-2 text-white">
                 {submission.score} / {submission.total}
               </div>
             </div>
-            {dataRef.current?.map((result) => {
-              let name: JSX.Element | undefined;
-              if (result.name) {
-                const Tag: keyof JSX.IntrinsicElements = result.items
-                  ? "h3"
-                  : "h2";
-                name = <Tag key={`name_${result.name}`}>{result.name}</Tag>;
-              }
-              return (
-                <>
-                  {name}
-                  {result.content && (
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: result.content,
-                      }}
-                    ></div>
-                  )}
-                  {result.items &&
-                    result.items.map((v, i) => (
-                      <div
-                        key={i}
-                        dangerouslySetInnerHTML={{ __html: v }}
-                      ></div>
-                    ))}
-                </>
-              );
-            })}
+            <ExportDataOutput results={output} />
+            <hr />
+            <p className="text-gray-500 text-sm">
+              สงวนลิขสิทธิ์ 2564-2565 คณะกรรมการนักเรียน ปีการศึกษา 2564
+            </p>
           </article>
         </div>
       )}

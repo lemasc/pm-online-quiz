@@ -32,7 +32,9 @@ export type ExamAPIItem = Pick<ExamModel, "level" | "subject" | "time"> & {
 };
 
 export type SubmissionAPIItem = Omit<ExamSubmission, "answers" | "hash"> &
-  ExamAPIItem;
+  ExamAPIItem & {
+    downloadToken: string;
+  };
 
 export type ExamListModel = {
   exam: ExamAPIItem[];
@@ -74,4 +76,9 @@ export type ExamSubmission = {
   answers: ExamSubmitBody["answers"];
   startTime: Date;
   submittedTime: Date;
+};
+
+export type DownloadToken = {
+  userId: string;
+  submissionId: string;
 };

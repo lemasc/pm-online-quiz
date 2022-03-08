@@ -1,9 +1,17 @@
 import { useHistoryRouter } from "@/context/history";
 import { siteName } from "@/shared/constants";
+import { ExamAPIItem, ExamLevel } from "@/types/exam";
 import { ChevronLeftIcon } from "@heroicons/react/outline";
 import Head from "next/head";
 import { ReactElement, ReactNode } from "react";
 import { ToastContainer } from "react-toastify";
+
+export function withExamName(title: string, exam?: ExamAPIItem) {
+  const examName = exam
+    ? `(${exam?.subject} - ${exam && ExamLevel[exam.level]})`
+    : "";
+  return title + examName;
+}
 
 export function Navbar({
   title,

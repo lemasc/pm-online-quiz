@@ -2,8 +2,10 @@ import { useAuth } from "@/context/auth";
 import { ExamListModel, ExamSubmission } from "@/types/exam";
 import axios from "axios";
 import { onIdTokenChanged } from "firebase/auth";
+import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
+import { immutable } from "swr/immutable/dist/immutable";
 import { auth } from "./firebase";
 
 export const useExamList = (immutable?: boolean) => {
@@ -48,4 +50,30 @@ export const useExamList = (immutable?: boolean) => {
     [swr]
   );
   return swr;
+};
+
+export const useCurrentExam = (immutable?: boolean) => {
+  const { data: examList, ...swr } = useExamList(immutable);
+  const { query } = useRouter();
+  const data =
+    examList && typeof query.path === "string"
+      ? examList.exam.find((v) => v.id === query.path)
+      : undefined;
+  return {
+    data,
+    ...swr,
+  };
+};
+
+export const useCurrentSubmission = (immutable?: boolean) => {
+  const { data: examList, ...swr } = useExamList(immutable);
+  const { query } = useRouter();
+  const data =
+    examList && typeof query.path === "string"
+      ? examList.submission[query.path]
+      : undefined;
+  return {
+    data,
+    ...swr,
+  };
 };

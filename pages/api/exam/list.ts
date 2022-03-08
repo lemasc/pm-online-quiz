@@ -1,12 +1,14 @@
 import { withFirebase, readFile, withDocumentDatesParsed } from "@/shared/api";
 import admin from "@/shared/firebase-admin";
-import { withAPISession } from "@/shared/session";
+import { sessionOptions, withAPISession } from "@/shared/session";
 import {
+  DownloadToken,
   ExamAPIItem,
   ExamListModel,
   ExamSubmission,
   SubmissionAPIItem,
 } from "@/types/exam";
+import { sealData } from "iron-session";
 import { NextApiHandler } from "next";
 
 const db = admin.firestore();
@@ -29,21 +31,27 @@ const examList: NextApiHandler<ExamListModel> = async (req, res) => {
     const submission = new Map<string, SubmissionAPIItem>();
     rawExam.map((v) => ready.set(v.id, { ...v, status: "READY", id: v.id }));
 
-    rawSubmission.docs.map((v) => {
-      const doc = v.data();
-      delete doc.answers;
-      delete doc.hash;
-      const data = withDocumentDatesParsed(doc as ExamSubmission, [
-        "startTime",
-        "submittedTime",
-      ]);
-      submission.set(v.id, {
-        ...data,
-        ...(ready.get(v.id) as any),
-        status: "SUBMITTED",
-      });
-      ready.delete(v.id);
-    });
+    await Promise.all(
+      rawSubmission.docs.map(async (v) => {
+        const doc = v.data();
+        delete doc.answers;
+        delete doc.hash;
+        const data = withDocumentDatesParsed(doc as ExamSubmission, [
+          "startTime",
+          "submittedTime",
+        ]);
+        submission.set(v.id, {
+          ...data,
+          ...(ready.get(v.id) as any),
+          downloadToken: await sealData<DownloadToken>(
+            { userId: req.token.uid, submissionId: v.id },
+            sessionOptions
+          ),
+          status: "SUBMITTED",
+        });
+        ready.delete(v.id);
+      })
+    );
 
     if (rawSession) {
       Object.keys(rawSession).map((id) => {

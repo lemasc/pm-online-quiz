@@ -2,26 +2,20 @@
   header,
   footer,
   aside,
-  form,
   … {
     display: none;
   }
-  .situation {
+  .printable {
     @apply border border-gray-400 rounded;
   }
 }
 
-@page: first {
-  margin: 0cm;
+@page {
+  margin: 1.5cm 1.5cm 1.5cm 1.5cm;
 }
+
 @page: last {
   margin: 5cm;
-}
-@page: left {
-  margin: 2cm 1.5cm 2cm 2cm;
-}
-@page: right {
-  margin: 2cm 2cm 2cm 1.5cm;
 }
 
 .print .toastui-editor-custom-block-view {

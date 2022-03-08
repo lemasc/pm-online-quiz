@@ -1,10 +1,10 @@
-import Container, { Navbar } from "@/components/container";
+import Container, { Navbar, withExamName } from "@/components/container";
 import { ContentLoading } from "@/components/quiz/viewer";
 import { useAuth } from "@/context/auth";
-import { useExamList } from "@/shared/examList";
+import { useCurrentExam } from "@/shared/examList";
 import { ExamLevel } from "@/types/exam";
 import { ChevronRightIcon } from "@heroicons/react/outline";
-import axios, { Axios } from "axios";
+import axios from "axios";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -32,7 +32,7 @@ const restoreSession = async (id: string, token: string) => {
 
 const ExamLoading: NextPage = () => {
   const [loading, setLoading] = useState(true);
-  const { data: examList } = useExamList(true);
+  const { data } = useCurrentExam();
   const { user } = useAuth();
   const router = useRouter();
   const isProcessing = useRef(false);
@@ -76,25 +76,14 @@ const ExamLoading: NextPage = () => {
     }
   };
 
-  const currentExam =
-    examList && typeof router.query.path === "string"
-      ? examList.exam.find((v) => v.id === router.query.path)
-      : undefined;
-
-  const examName = `${currentExam?.subject} - ${
-    currentExam && ExamLevel[currentExam.level]
-  }`;
-
   return (
     <Container
-      title={`${
-        currentExam && !loading ? "คำชี้แจง" : "กำลังโหลด..."
-      } (${examName})`}
+      title={withExamName(data && !loading ? "คำชี้แจง" : "กำลังโหลด...", data)}
       fullscreen
     >
       <Navbar backBtn title={"คำชี้แจง"} />
       <div className="flex flex-col items-center flex-grow px-6 py-6 md:py-8">
-        {currentExam && !loading ? (
+        {data && !loading ? (
           <div className="flex flex-col w-full max-w-2xl font-sarabun content">
             <h2 className="text-center">คำชี้แจง</h2>
             <div className="form-container">
@@ -102,23 +91,22 @@ const ExamLoading: NextPage = () => {
                 <u>ชื่อแบบทดสอบ</u>
               </b>
               <span>
-                {currentExam?.subject} -{" "}
-                {currentExam && ExamLevel[currentExam.level]}
+                {data?.subject} - {data && ExamLevel[data.level]}
               </span>
               <b>
                 <u>รายละเอียดแบบทดสอบ</u>
               </b>
-              <span>แบบทดสอบนี้มีทั้งหมด 1 ชุด {currentExam.count} ข้อ </span>
+              <span>แบบทดสอบนี้มีทั้งหมด 1 ชุด {data.count} ข้อ </span>
               <b>
                 <u>เกณฑ์การให้คะแนน</u>
               </b>
-              <span>ข้อละ 1 คะแนน คะแนนเต็ม {currentExam.count} คะแนน </span>
-              {currentExam.time && (
+              <span>ข้อละ 1 คะแนน คะแนนเต็ม {data.count} คะแนน </span>
+              {data.time && (
                 <>
                   <b>
                     <u>เวลาในการทำแบบทดสอบ</u>
                   </b>
-                  <span>ให้เวลาทำแบบทดสอบ {currentExam.time} นาที</span>
+                  <span>ให้เวลาทำแบบทดสอบ {data.time} นาที</span>
                 </>
               )}
             </div>
@@ -129,10 +117,10 @@ const ExamLoading: NextPage = () => {
               <ol>
                 <li>
                   <div className="content-sublist space-y-2">
-                    แบบทดสอบนี้มีทั้งหมด {currentExam.names.length || 1} ส่วน
-                    {currentExam.names.length > 0 && (
+                    แบบทดสอบนี้มีทั้งหมด {data.names.length || 1} ส่วน
+                    {data.names.length > 0 && (
                       <ul>
-                        {currentExam.names.map((name) => (
+                        {data.names.map((name) => (
                           <li key={name}>{name}</li>
                         ))}
                       </ul>
@@ -142,7 +130,7 @@ const ExamLoading: NextPage = () => {
                 <li>
                   <p className="content-sublist">
                     แบบทดสอบชุดเป็นแบบเลือกตอบ{" "}
-                    {currentExam.level === "SECONDARY" ? 4 : 5} ตัวเลือก
+                    {data.level === "SECONDARY" ? 4 : 5} ตัวเลือก
                     ให้เลือกคำตอบที่ถูกต้องที่สุดเพียงข้อเดียว
                   </p>
                 </li>
@@ -164,15 +152,15 @@ const ExamLoading: NextPage = () => {
               <ol>
                 <li>
                   <p className="content-sublist">
-                    ผู้เข้าร่วมที่ทำแบบทดสอบได้{" "}
-                    {Math.ceil(0.8 * currentExam.count)} ข้อขึ้นไป (ร้อยละ 80
-                    ของจำนวนข้อทั้งหมด) จะได้รับใบประกาศนียบัตร
+                    ผู้เข้าร่วมที่ทำแบบทดสอบได้ {Math.ceil(0.8 * data.count)}{" "}
+                    ข้อขึ้นไป (ร้อยละ 80 ของจำนวนข้อทั้งหมด)
+                    จะได้รับใบประกาศนียบัตร
                   </p>
                 </li>
-                {currentExam.time && (
+                {data.time && (
                   <li>
                     <p className="content-sublist">
-                      หากเวลาในการทำข้อสอบครบ {currentExam.time} นาทีแล้ว
+                      หากเวลาในการทำข้อสอบครบ {data.time} นาทีแล้ว
                       ระบบจะส่งคำตอบของท่านโดยอัตโนมัติ
                     </p>
                   </li>
