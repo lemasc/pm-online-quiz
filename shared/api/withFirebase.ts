@@ -14,15 +14,13 @@ declare module "next" {
 }
 
 export async function getSubmission(token: string, id: string) {
-  const { userId, submissionId } = await unsealData<DownloadToken>(
-    token,
-    sessionOptions
-  );
-  if (id !== submissionId) throw new Error("ID token and request mismatched.");
+  const tokenData = await unsealData<DownloadToken>(token, sessionOptions);
+  if (id !== tokenData.submissionId)
+    throw new Error("ID token and request mismatched.");
   const submission = await admin
     .firestore()
     .collection("users")
-    .doc(userId)
+    .doc(tokenData.userId)
     .collection("submissions")
     .doc(id)
     .get();
@@ -33,7 +31,7 @@ export async function getSubmission(token: string, id: string) {
   const metadataDoc = await admin
     .firestore()
     .collection("users")
-    .doc(userId)
+    .doc(tokenData.userId)
     .get();
 
   if (!metadataDoc.exists) throw new Error("User metadata not found.");
@@ -47,6 +45,7 @@ export async function getSubmission(token: string, id: string) {
       ]),
     },
     exam: examData,
+    tokenData,
   };
 }
 

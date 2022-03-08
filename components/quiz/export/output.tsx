@@ -9,7 +9,6 @@ export function ExportDataOutput({ results }: { results?: Result[] }) {
         .forEach((elem) => (elem.disabled = true));
     }, 100);
   }, [results]);
-  let index = 0;
   return (
     <>
       {results?.map((result, index) => {
@@ -32,7 +31,14 @@ export function ExportDataOutput({ results }: { results?: Result[] }) {
               result.items.map((v, i) => (
                 <div className="space-y-2" key={`export_${index}_item${i}`}>
                   <p>
-                    <b>{v.index}.</b>
+                    <b>{v.index}.</b>{" "}
+                    {(v as any).adminHtml && (
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: (v as any).adminHtml,
+                        }}
+                      />
+                    )}
                   </p>
                   <div
                     key={i}

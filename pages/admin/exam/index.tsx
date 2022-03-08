@@ -1,17 +1,8 @@
 import QuizManager, { Buttons } from "@/components/quiz/manager";
 import { ExamLevel, GenericExamModel } from "@/types/exam";
-import { PencilIcon, TrashIcon } from "@heroicons/react/outline";
-import { GetServerSideProps, NextPage } from "next";
-import { useState } from "react";
+import { NextPage } from "next";
 import { useCollection } from "swr-firestore-v9";
-import { ModalConfig } from "@/components/quiz/modal";
 import Link from "next/link";
-/*
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  return {
-    notFound: true,
-  };
-};*/
 
 const Page: NextPage = () => {
   const { data } = useCollection<GenericExamModel>("/exam", {

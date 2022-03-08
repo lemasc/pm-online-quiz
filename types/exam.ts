@@ -81,4 +81,5 @@ export type ExamSubmission = {
 export type DownloadToken = {
   userId: string;
   submissionId: string;
+  admin?: boolean;
 };

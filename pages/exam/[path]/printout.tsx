@@ -32,6 +32,7 @@ type Props = {
     submittedTime: number;
   };
   name: string;
+  admin?: boolean;
 };
 
 export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
@@ -48,6 +49,7 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
       submission: { answers: _answers, hash, submittedTime, score, total },
       exam: { level, subject },
       metadata,
+      tokenData: { admin },
     } = await getSubmission(token, id);
     if (!_answers) {
       return {
@@ -81,11 +83,21 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
           key,
           {
             ...(contentData ? { content: contentData } : {}),
-            ...(canShowName ? { name } : {}),
-            items: entries.map((ans) => ({
-              selected: ans.selected ?? -1,
-              content: items?.[ans.item]?.content ?? "",
-            })),
+            ...((canShowName || admin) && name ? { name } : {}),
+            items: entries.map((ans) => {
+              const correct = items?.[ans.item].selected === ans.selected;
+              const adminHtml = `<b class="text-gray-500"><span class="${
+                correct ? "text-green-600" : "text-red-600"
+              }">${correct ? "ถูกต้อง" : "ผิด"} (เฉลย ${
+                (items?.[ans.item].selected ?? -1) + 1
+              })</span> ต้นฉบับอยู่ข้อที่ ${ans.item}</b>`;
+
+              return {
+                selected: ans.selected ?? -1,
+                content: items?.[ans.item]?.content ?? -1,
+                ...(admin ? { adminHtml } : {}),
+              };
+            }),
           },
         ];
       })
@@ -135,6 +147,7 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
           submittedTime: submittedTime.valueOf(),
         },
         name: metadata.nameTitle + metadata.name,
+        admin,
       },
     };
   } catch (err) {
@@ -147,7 +160,7 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
   }
 };
 
-export default function PrintPage({ results, submission, name }: Props) {
+export default function PrintPage({ results, submission, name, admin }: Props) {
   const { metadata } = useAuth();
   const [output, setOutput] = useState<Result[]>();
   const { back } = useHistoryRouter();
@@ -162,7 +175,7 @@ export default function PrintPage({ results, submission, name }: Props) {
       </Head>
       <header className="p-6 font-prompt sticky top-0 bg-quiz-orange-500 text-white shadow z-10 ">
         <div className="flex flex-row gap-2 flex-grow items-center">
-          {output && (
+          {!admin && output && (
             <button onClick={() => back(`/exam/${submission.id}/report`)}>
               <ChevronLeftIcon className="h-6 w-6" />
             </button>
