@@ -8,7 +8,7 @@ import { ToastContainer } from "react-toastify";
 
 export function withExamName(title: string, exam?: ExamAPIItem) {
   const examName = exam
-    ? `(${exam?.subject} - ${exam && ExamLevel[exam.level]})`
+    ? ` (${exam?.subject} - ${exam && ExamLevel[exam.level]})`
     : "";
   return title + examName;
 }

@@ -25,7 +25,6 @@ const handler: NextApiHandler = async (req, res) => {
     const body = Object.fromEntries(req.body.data);
     if (req.body.type === "ISSUE_FORM") {
       const isNameIssue = Object.keys(body).some((v) => v.includes("ชื่อ"));
-
       const fields = req.body.data
         .map(([key, value]) => `${key}: ${value.join(" ")}`)
         .join("\n");
@@ -33,7 +32,7 @@ const handler: NextApiHandler = async (req, res) => {
       if (isNameIssue) {
         const doc = await db.collection("drafts").add(body);
         message.push(
-          `ตรวจสอบและบันทึกการแก้ไข:\nhttps://${req.headers.host}/admin/user/update/${doc.id}`
+          `ตรวจสอบและบันทึกการแก้ไข:\nhttps://${req.headers.host}/admin/users/update/${doc.id}`
         );
       }
       await axios.post(

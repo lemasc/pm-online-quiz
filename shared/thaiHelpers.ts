@@ -1,4 +1,4 @@
-import dayjs, { Dayjs, ConfigType } from "dayjs";
+import dayjs, { ConfigType } from "dayjs";
 import LocalizedFormat from "dayjs/plugin/localizedFormat";
 import th from "dayjs/locale/th";
 dayjs.locale(th);

@@ -18,7 +18,7 @@ const units: Partial<Record<DurationUnitType, string>> = {
   s: "วินาที",
 };
 const ExamReport: NextPage = () => {
-  const { user, metadata } = useAuth();
+  const { metadata } = useAuth();
   const { push, query } = useRouter();
   const { data: submission } = useCurrentSubmission();
 

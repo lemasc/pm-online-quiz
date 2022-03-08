@@ -1,15 +1,12 @@
 import { useAuth } from "@/context/auth";
 import { ExamContentPayload, ExamStartPayload } from "@/types/exam";
-import axios from "axios";
-import equal from "fast-deep-equal";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Middleware, mutate, SWRConfiguration, SWRHook } from "swr";
 import useSWR from "swr/immutable";
-import create from "zustand";
 import { QuizItem } from "../types";
 import { quizStore, useQuizStoreSync } from "./store";
-import { remoteExam, RemoteExamError, timerStore } from "./timer";
+import { remoteExam, RemoteExamError } from "./timer";
 
 const axiosFetch = (key: string) => remoteExam.get(key).then((r) => r.data);
 

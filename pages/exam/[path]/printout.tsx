@@ -147,7 +147,7 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
           submittedTime: submittedTime.valueOf(),
         },
         name: metadata.nameTitle + metadata.name,
-        admin,
+        ...(admin ? { admin } : {}),
       },
     };
   } catch (err) {
@@ -169,7 +169,7 @@ export default function PrintPage({ results, submission, name, admin }: Props) {
     <main className="flex flex-col print min-h-screen">
       <Head>
         <title>
-          {output ? "สำเนาข้อสอบ" : "กำลังโหลด..."} ( {submission.subject} -{" "}
+          {output ? "สำเนาข้อสอบ" : "กำลังโหลด..."} ({submission.subject} -{" "}
           {ExamLevel[submission.level]})
         </title>
       </Head>
