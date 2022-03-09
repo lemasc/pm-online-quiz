@@ -9,7 +9,7 @@ export default function NameEditModal({
   show: boolean;
   setShow: (show: boolean) => void;
 }) {
-  const { user, metadata } = useAuth();
+  const { user } = useAuth();
   const mounted = useRef<boolean>(false);
   useEffect(() => {
     if (!mounted.current) {
@@ -20,12 +20,10 @@ export default function NameEditModal({
     }
   }, [show, setShow]);
 
-  if (!user || !metadata) return null;
+  if (!user) return null;
   const formParams = {
     "entry.364995045": user.email ?? "",
     "entry.1751397710": "คำนำหน้า ชื่อ หรือนามสกุล ไม่ถูกต้อง",
-    "entry.1393696291": metadata.nameTitle ?? "",
-    "entry.204662022": metadata.name ?? "",
   };
 
   const FORM_URL = `${
@@ -40,7 +38,7 @@ export default function NameEditModal({
       onClose={() => setShow(false)}
       titleClass="border-b font-medium font-prompt"
     >
-      <div className="px-6 py-4 font-prompt space-y-4 text-sm md:text-base">
+      <div className="px-6 py-4 font-sarabun space-y-4 text-sm md:text-base">
         <p>
           ชื่อ-นามสกุลของคุณในระบบจะถูกแสดงในเกียรติบัตรหลังทำแบบทดสอบเสร็จสิ้นแล้ว
         </p>
@@ -55,7 +53,7 @@ export default function NameEditModal({
             rel="noreferrer noopener"
             href={FORM_URL}
             onClick={() => setShow(false)}
-            className="text-center w-full text-white rounded focus:outline-none px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-200"
+            className="text-center w-full text-white rounded focus:outline-none px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-200"
           >
             ส่งคำขอ
           </a>

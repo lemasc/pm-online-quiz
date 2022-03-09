@@ -8,10 +8,7 @@ function main() {
   assets.map((file) => {
     const data = fs.readFileSync(path.join("./statics/raw", file));
     const parsed = path.parse(file);
-    output.set(
-      parsed.name,
-      `data:${mime.getType(parsed.ext)};base64,` + data.toString("base64")
-    );
+    output.set(parsed.name, data.toJSON().data);
   });
   fs.writeFileSync(
     "./statics/index.json",

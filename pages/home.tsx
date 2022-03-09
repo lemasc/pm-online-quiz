@@ -3,6 +3,7 @@ import { useAuth } from "@/context/auth";
 import { ExamLevel } from "@/types/exam";
 import {
   AcademicCapIcon,
+  ChevronUpIcon,
   ClipboardListIcon,
   PencilIcon,
 } from "@heroicons/react/outline";
@@ -10,10 +11,11 @@ import {
 import { NextPage } from "next";
 import { LogoutIcon } from "@heroicons/react/outline";
 import { useExamList } from "@/shared/examList";
-import { ComponentProps, useState } from "react";
+import { ComponentProps, Fragment, useState } from "react";
 import Link from "next/link";
 import { formatDateTime } from "@/shared/thaiHelpers";
 import NameEditModal from "@/components/nameModal";
+import { Disclosure } from "@headlessui/react";
 
 const Card = ({ href, ...props }: Omit<ComponentProps<"a">, "className">) => {
   return (
@@ -23,6 +25,59 @@ const Card = ({ href, ...props }: Omit<ComponentProps<"a">, "className">) => {
         {...props}
       />
     </Link>
+  );
+};
+
+const NameList2 = ({ title, names }: { title: string; names: string[] }) => {
+  return (
+    <div className="content">
+      <h4 className="text-quiz-orange-600 font-prompt">{title}</h4>
+      <ul>
+        {names.map((v) => (
+          <li key={`${title}_${v}`}>
+            <div className="content-sublit">{v}</div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+const NameList = ({ title, names }: { title: string; names: string[] }) => {
+  return (
+    <div className="w-full rounded-lg">
+      <Disclosure>
+        {({ open }) => (
+          <>
+            <Disclosure.Button
+              className={[
+                "flex items-center space-x-4 w-full px-4 py-2 font-medium text-left focus:outline-none focus-visible:ring",
+                "text-quiz-orange-700  hover:bg-quiz-orange-200 focus-visible:ring-quiz-orange-600",
+                open
+                  ? "rounded-t-lg bg-quiz-orange-200"
+                  : "rounded-lg bg-quiz-orange-100",
+              ].join(" ")}
+            >
+              <span className="font-prompt flex-grow">{title}</span>
+              <ChevronUpIcon
+                className={`${open ? "transform rotate-180" : ""} w-5 h-5`}
+              />
+            </Disclosure.Button>
+            <Disclosure.Panel className="w-full text-gray-800 content-font bg-quiz-orange-50 rounded-b-lg">
+              <div className="content min-h-0">
+                <ul className="overflow-auto min-h-0 h-full max-h-[250px] w-full px-6 py-3">
+                  {names.map((v) => (
+                    <li key={`${title}_${v}`}>
+                      <div className="content-sublit">{v}</div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Disclosure.Panel>
+          </>
+        )}
+      </Disclosure>
+    </div>
   );
 };
 
@@ -123,17 +178,59 @@ const List: NextPage = () => {
       </div>
 
       <div className="flex flex-col gap-4 py-2 divide-y flex-grow">
-        {true && (
-          <section className="p-6 flex flex-col gap-4">
-            <div className="flex flex-row items-center gap-2 text-quiz-blue-500">
-              <AcademicCapIcon className="h-7 w-7" />
-              <h3 className="text-xl font-bold">รายละเอียดโครงการ</h3>
+        <section className="p-6 flex flex-col gap-4">
+          <div className="flex flex-row items-center gap-2 text-quiz-blue-500">
+            <AcademicCapIcon className="h-7 w-7" />
+            <h3 className="text-xl font-bold">รายละเอียดโครงการ</h3>
+          </div>
+          <div className="content font-sarabun indent">
+            <h4 className="text-quiz-blue-500 font-prompt">คำอธิบายโครงการ</h4>
+            <p className="pb-2">
+              คณะกรรมการนักเรียนฝ่ายวิชาการประจำปีการศึกษา 2564
+              โรงเรียนมัธยมสาธิตวัดพระศรีมหาธาตุ มหาวิทยาลัยราชภัฏพระนคร
+              ได้ตระหนักถึงความสำคัญของการศึกษา
+              นอกจากจะมีกระบวนการการเรียนการสอนโดยเน้นผู้เรียนเป็นสำคัญในห้องเรียนแล้ว
+              ยังจำเป็นต้องมีกิจกรรมด้านวิชาการอื่นเพื่อให้นักเรียนได้แสดงความสามารถ
+              มีเจตคติที่ดี และใฝ่เรียนรู้ในรายวิชาต่าง ๆ
+              จึงได้จัดทำโครงการแข่งขันตอบปัญหาวิชาการขึ้น
+              เพื่อเปิดโอกาสให้นักเรียนได้แสดงความสามารถด้านวิชาการ
+              ซึ่งจะเป็นประโยชน์ และเพิ่มศักยภาพในการเรียนรู้อย่างสูงสุด
+            </p>
+            <h4 className="text-quiz-blue-500 font-prompt">
+              คณะผู้จัดทำโครงการ
+            </h4>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 py-2">
+              <NameList
+                title="พัฒนาระบบเว็บไซต์โดย"
+                names={["นายศักดิธัช ธนาสดใส", "นายกิตติพิชญ์ ปิ่นถาวรรักษ์"]}
+              />
+              <NameList
+                title="ออกแบบเว็บไซต์โดย"
+                names={[
+                  "นางสาวกัญญาภัทร อิทธิพงศ์เมธี",
+                  "นางสาวชนิดาภา สารรัตน์",
+                  "นางสาวมณีน่าน ทัพผดุง",
+                  "นางสาวรังสิตกานต์ ขจรรัตนวณิชย์",
+                  "นายสุชน ปิติการ",
+                ]}
+              />
+              <NameList
+                title="รวบรวมข้อสอบโดย"
+                names={[
+                  "นางสาวขวัญชนก ทรงจรัสพงศ์",
+                  "นางสาวญาณิศา ชินโสตร์",
+                  "นางสาวณัฐณิชา จิระธรรมกิจกุล",
+                  "นางสาวณัฐธิตา โอภาสเสถียร",
+                  "นางสาวปาลินี ศรีสุทธางกูร",
+                  "นายปิติพงศ์ ผลเเก้ว",
+                  "นางสาววรินธร พุทธรักษา",
+                  "นายศิวา สุภาวงษ์",
+                  "นางสาวพชรพร เริงฤทธิ์",
+                ]}
+              />
             </div>
-            <div className="flex flex-row flex-wrap gap-4 font-sarabun items-center">
-              {/* TODO: Add project detail here. */}
-            </div>
-          </section>
-        )}
+          </div>
+        </section>
         <section className="p-6 flex flex-col gap-4">
           <div className="flex flex-row items-center gap-2 text-quiz-blue-500">
             <AcademicCapIcon className="h-7 w-7" />

@@ -7,8 +7,10 @@ import { getSubmission } from "@/shared/api";
 import dayjs from "@/shared/dayjs";
 import statics from "../../../../statics/index.json";
 
-const file = (name: keyof typeof statics) =>
-  Buffer.from(statics[name], "base64");
+const file = (name: string) => {
+  const buffer = Buffer.from((statics as any)[name]);
+  return buffer;
+};
 
 const certificate: NextApiHandler = async (req, res) => {
   try {
@@ -32,7 +34,7 @@ const certificate: NextApiHandler = async (req, res) => {
       },
       margin: 0,
       info: {
-        Title: "ประกาศนียบัตรโครงการ" + siteName,
+        Title: "เกียรติบัตรโครงการ" + siteName,
         Author: "คณะกรรมการนักเรียน ปีการศึกษา 2564",
         CreationDate: new Date(),
         ModDate: new Date(),
@@ -43,24 +45,23 @@ const certificate: NextApiHandler = async (req, res) => {
     });
 
     const {
-      submission: { score, total, startTime, submittedTime },
-      exam: { level, subject },
+      submission: { score, total, submittedTime },
+      exam: { subject },
       metadata,
     } = await getSubmission(token, id);
 
     doc.registerFont("Regular", file("THSarabunNew"));
     doc.registerFont("Bold", file("THSarabunNewBold"));
 
-    const isUpper = level === "UPPER_SECONDARY";
-
-    doc.image(file(isUpper ? "cert_upper" : "cert_secondary"), 0, 0, {
+    doc.image(file("cert"), 0, 0, {
       width: Math.ceil(doc.page.width),
       height: Math.ceil(doc.page.height),
     });
-    doc.image(file("watermark"), 0, 0, {
+    /*doc.image(file("watermark"), 0, 0, {
       width: Math.ceil(doc.page.width),
       height: Math.ceil(doc.page.height),
     });
+    */
 
     doc
       .font("Bold")
@@ -68,42 +69,20 @@ const certificate: NextApiHandler = async (req, res) => {
       .text(`${metadata.nameTitle}${metadata.name}`, 0, 221, {
         align: "center",
       });
-    doc
-      .font("Regular")
-      .fontSize(22)
-      .text(subject, isUpper ? -265 : -210, 294.25, {
-        align: "center",
-      });
-    doc.font("Regular").fontSize(19).text(thaiDigits(score), -480, 332, {
-      align: "center",
-    });
-    doc.font("Regular").fontSize(19).text(thaiDigits(total), -165, 332, {
-      align: "center",
-    });
-    doc.font("Regular").fontSize(22).text(thaiDigits(7), -10, 398, {
-      align: "center",
-    });
+    doc.font("Bold").fontSize(22).text(subject, 583, 259);
 
-    const diff = dayjs(submittedTime).diff(startTime);
-    const duration = dayjs.duration(diff);
+    // Original Value 22,-10,330
+    doc
+      .font("Regular")
+      .fontSize(16)
+      .text(thaiDigits(dayjs(submittedTime).get("d")), -11, 335, {
+        align: "center",
+      });
+
     doc
       .font("Regular")
       .fontSize(19)
-      .text(thaiDigits(Math.floor(duration.as("m"))), 433, 332, {
-        align: "center",
-      });
-    doc
-      .font("Regular")
-      .fontSize(19)
-      .text(thaiDigits(Math.ceil(duration.get("s"))), 528, 332, {
-        align: "center",
-      });
-    doc
-      .font("Regular")
-      .fontSize(19)
-      .text(thaiDigits(((score * 100) / total).toFixed(2)), 162, 332, {
-        align: "center",
-      });
+      .text(thaiDigits(((score * 100) / total).toFixed(2)), 542, 297);
 
     doc.end();
     res.setHeader("Content-Transfer-Encoding", "Binary");
@@ -114,7 +93,7 @@ const certificate: NextApiHandler = async (req, res) => {
     doc.pipe(res);
   } catch (err) {
     console.error(err);
-    res.status(403).end();
+    res.status(500).end();
   }
 };
 
