@@ -191,6 +191,8 @@ const View: NextPage = () => {
     quizItemStore.setState({ selected: -1 });
   }, []);
 
+  const [isSubmitting, setSubmitting] = useState(false);
+
   const submit = useCallback(
     async (showConfirm = true) => {
       if (!user) return;
@@ -220,6 +222,7 @@ const View: NextPage = () => {
         return;
       }
       try {
+        setSubmitting(true);
         await axios.post(`/api/exam/${router.query.path}/submit`, body, {
           headers: {
             Authorization: `Bearer ${await user?.getIdToken()}`,
@@ -231,7 +234,11 @@ const View: NextPage = () => {
           query: { path: router.query.path },
         });
       } catch (err) {
-        console.error(err);
+        const errCode = axios.isAxiosError(err)
+          ? err.response?.status ?? 0
+          : -1;
+        alert("ไม่สามารถส่งคำตอบได้ ข้อผิดพลาด: " + errCode);
+        setSubmitting(false);
       }
     },
     [router, user]
@@ -384,7 +391,11 @@ const View: NextPage = () => {
                 <Controls min />
               </div>
             </div>
-            <Viewer ref={(ref) => (editorRef.current = ref as ViewerClass)} />
+            {isSubmitting ? (
+              <ContentLoading />
+            ) : (
+              <Viewer ref={(ref) => (editorRef.current = ref as ViewerClass)} />
+            )}
             <Controls />
             {index !== 0 && (
               <div className="w-full">

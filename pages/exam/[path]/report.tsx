@@ -10,6 +10,7 @@ import { formatDateTime } from "@/shared/thaiHelpers";
 import dayjs from "dayjs";
 import Duration, { DurationUnitType } from "dayjs/plugin/duration";
 import PieChart from "@/components/PieChart";
+import { useEffect, useState } from "react";
 dayjs.extend(Duration);
 
 const units: Partial<Record<DurationUnitType, string>> = {
@@ -17,9 +18,13 @@ const units: Partial<Record<DurationUnitType, string>> = {
   m: "นาที",
   s: "วินาที",
 };
+
+type Target = "certificate" | "printout";
+
 const ExamReport: NextPage = () => {
   const { metadata } = useAuth();
-  const { push, query } = useRouter();
+  const router = useRouter();
+  const [target, setTarget] = useState<Set<Target>>(new Set());
   const { data: submission } = useCurrentSubmission();
 
   const getDiff = () => {
@@ -34,6 +39,42 @@ const ExamReport: NextPage = () => {
       })
       .filter((v) => v !== undefined);
     return output.join(" ");
+  };
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    const handleRouteError = (err: Error, url: string) => {
+      if (url.includes("certificate")) {
+        // Certificate is an API route, which will cause router to emit routeChangeError
+        // Simulate finish loading.
+        setTimeout(
+          () =>
+            setTarget((target) => {
+              const set = new Set(target);
+              set.delete("certificate");
+              return set;
+            }),
+          4000
+        );
+      }
+    };
+    router.events.on("routeChangeError", handleRouteError);
+
+    return () => {
+      router.events.off("routeChangeError", handleRouteError);
+    };
+  }, [router]);
+
+  const goTo = (to: Target) => {
+    console.log("Goto", to);
+    setTarget((target) => new Set(target).add(to));
+    router.push({
+      pathname: `${to === "certificate" ? "/api" : ""}/exam/[path]/${to}`,
+      query: {
+        path: router.query.path,
+        token: submission?.downloadToken,
+      },
+    });
   };
 
   return (
@@ -86,31 +127,17 @@ const ExamReport: NextPage = () => {
               </div>
               <div className="grid sm:grid-cols-2 gap-4 items-center justify-center w-full">
                 <button
-                  onClick={() =>
-                    push({
-                      pathname: "/exam/[path]/printout",
-                      query: {
-                        path: query.path,
-                        token: submission.downloadToken,
-                      },
-                    })
-                  }
-                  className="px-4 py-3 flex flex-row gap-2 justify-center items-center bg-quiz-orange-500 hover:bg-quiz-orange-600 rounded text-white"
+                  onClick={() => goTo("printout")}
+                  className="px-4 py-3 flex flex-row gap-2 justify-center items-center bg-quiz-orange-500 hover:bg-quiz-orange-600 disabled:bg-gray-200 disabled:text-gray-500 rounded text-white"
+                  disabled={target.has("printout")}
                 >
                   <PrinterIcon className="h-6 w-6" />
                   พิมพ์สำเนาข้อสอบ
                 </button>
                 <button
-                  onClick={() =>
-                    push({
-                      pathname: "/api/exam/[path]/certificate",
-                      query: {
-                        path: query.path,
-                        token: submission.downloadToken,
-                      },
-                    })
-                  }
-                  className="px-4 py-3 flex flex-row gap-2 justify-center items-center bg-green-600 hover:bg-green-700 rounded text-white"
+                  onClick={() => goTo("certificate")}
+                  className="px-4 py-3 flex flex-row gap-2 justify-center items-center bg-green-600 hover:bg-green-700 disabled:bg-gray-200  disabled:text-gray-500  rounded text-white"
+                  disabled={target.has("certificate")}
                 >
                   <DownloadIcon className="h-6 w-6" />
                   ดาวน์โหลดเกียรติบัตร (PDF)
