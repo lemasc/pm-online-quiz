@@ -6,7 +6,7 @@ import { IronSessionOptions } from "iron-session";
 export const sessionOptions: IronSessionOptions = {
   password: process.env.SESSION_PASSWORD as string,
   cookieName: "__exam",
-  ttl: 24 * 60 * 60,
+  ttl: 22 * 24 * 60 * 60,
   cookieOptions: {
     secure: process.env.NODE_ENV === "production",
   },

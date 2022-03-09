@@ -95,7 +95,7 @@ const List: NextPage = () => {
           </h1>
           <span className="text-sm md:text-base text-gray-500">
             {metadata
-              ? `ระดับชั้น ม. ${metadata.class}/${metadata.level}`
+              ? `ระดับชั้น ม.${metadata.class}/${metadata.level}`
               : `กำลังโหลดข้อมูล...`}
           </span>
         </div>
