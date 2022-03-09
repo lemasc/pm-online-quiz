@@ -7,11 +7,10 @@ import { NextPage } from "next";
 import { useCurrentSubmission } from "@/shared/examList";
 import { useRouter } from "next/router";
 import { formatDateTime } from "@/shared/thaiHelpers";
-import dayjs from "dayjs";
-import Duration, { DurationUnitType } from "dayjs/plugin/duration";
+import dayjs from "@/shared/dayjs";
+import type { DurationUnitType } from "dayjs/plugin/duration";
 import PieChart from "@/components/PieChart";
 import { useEffect, useState } from "react";
-dayjs.extend(Duration);
 
 const units: Partial<Record<DurationUnitType, string>> = {
   h: "ชั่วโมง",
@@ -66,7 +65,6 @@ const ExamReport: NextPage = () => {
   }, [router]);
 
   const goTo = (to: Target) => {
-    console.log("Goto", to);
     setTarget((target) => new Set(target).add(to));
     router.push({
       pathname: `${to === "certificate" ? "/api" : ""}/exam/[path]/${to}`,
@@ -125,6 +123,14 @@ const ExamReport: NextPage = () => {
                   />{" "}
                 </div>
               </div>
+              {metadata?.pendingEdit && (
+                <span className="text-red-600">
+                  ไม่สามารถพิมพ์ใบเกียรติบัตรได้ในขณะนี้
+                  เนื่องจากคุณได้ส่งคำขอแก้ไขข้อมูลส่วนตัว
+                  กรุณารอสักครู่แล้วจึงตรวจสอบใหม่อีกครั้ง (ภายใน 3
+                  ชั่วโมงนับจากเวลาที่ส่งคำขอ)
+                </span>
+              )}
               <div className="grid sm:grid-cols-2 gap-4 items-center justify-center w-full">
                 <button
                   onClick={() => goTo("printout")}
@@ -137,7 +143,7 @@ const ExamReport: NextPage = () => {
                 <button
                   onClick={() => goTo("certificate")}
                   className="px-4 py-3 flex flex-row gap-2 justify-center items-center bg-green-600 hover:bg-green-700 disabled:bg-gray-200  disabled:text-gray-500  rounded text-white"
-                  disabled={target.has("certificate")}
+                  disabled={target.has("certificate") || metadata?.pendingEdit}
                 >
                   <DownloadIcon className="h-6 w-6" />
                   ดาวน์โหลดเกียรติบัตร (PDF)

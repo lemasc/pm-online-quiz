@@ -1,10 +1,12 @@
 import Scrollable from "@/components/Scrollable";
 import { QuizItemState, quizItemStore } from "@/shared/store";
 import { timerStore } from "@/shared/timer";
-import dayjs from "dayjs";
+import dayjs from "@/shared/dayjs";
 import React, { useEffect } from "react";
 import { ViewerClass } from "./base";
-import TimeModal from "./timeModal";
+import dynamic from "next/dynamic";
+
+const TimeModal = dynamic(() => import("@/components/quiz/viewer/timeModal"));
 
 export const ContentViewer = React.memo(function ContentViewer({
   content,

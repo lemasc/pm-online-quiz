@@ -18,13 +18,14 @@ export type UserMetadata = {
   class: number;
   level: number;
   pendingEdit?: boolean;
+  surveyAnswered?: boolean;
 };
 
 interface IAuthContext {
   ready: boolean;
   user: User | null;
   metadata: Document<UserMetadata> | null | undefined;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: (teacher?: boolean) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -47,10 +48,10 @@ export function useProvideAuth(): IAuthContext {
     }
   );
 
-  const signInWithGoogle = async (): Promise<void> => {
+  const signInWithGoogle = async (teacher?: boolean): Promise<void> => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
-      hd: "wpm.pnru.ac.th",
+      hd: teacher ? "pnru.ac.th" : "wpm.pnru.ac.th",
     });
     await signInWithRedirect(auth, provider);
   };
@@ -84,6 +85,10 @@ export function useProvideAuth(): IAuthContext {
   useEffect(() => {
     return auth.onIdTokenChanged(async (curUser) => {
       if (curUser) {
+        /*LogRocket.identify(curUser.uid, {
+          name: curUser.displayName ?? "",
+          email: curUser.email ?? "",
+        });*/
         setUser(curUser);
       } else {
         setUser(null);

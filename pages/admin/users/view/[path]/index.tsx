@@ -1,21 +1,7 @@
-import QuizManager, { Buttons } from "@/components/quiz/manager";
-import { markdown } from "@/components/quiz/markdown";
 import UserManager from "@/components/users/manager";
 import { UserMetadata } from "@/context/auth";
-import { useExamQuery } from "@/shared/exam";
-import { useCurrentExam } from "@/shared/examList";
-import {
-  ExamLevel,
-  ExamModel,
-  ExamSubmission,
-  GenericExamModel,
-} from "@/types/exam";
-import dayjs from "dayjs";
-import localizedFormat from "dayjs/plugin/localizedFormat";
-import th from "dayjs/locale/th";
-dayjs.extend(localizedFormat);
-dayjs.locale(th);
-
+import { ExamLevel, ExamModel, ExamSubmission } from "@/types/exam";
+import dayjs from "@/shared/dayjs";
 import { NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";

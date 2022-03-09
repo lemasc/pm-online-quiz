@@ -1,7 +1,6 @@
-import Container, { Navbar } from "@/components/container";
+import Container, { Navbar, withExamName } from "@/components/container";
 import axios from "axios";
 import { NextPage } from "next";
-import Head from "next/head";
 import Viewer, {
   ContentLoading,
   ContentViewer,
@@ -17,7 +16,6 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import {
-  QuizItemState,
   quizItemStore,
   QuizState,
   quizStore,
@@ -30,12 +28,9 @@ import { CONTENT_INDEX } from "@/shared/constants";
 import { ExamLevel, ExamStartPayload, ExamSubmitBody } from "@/types/exam";
 import React from "react";
 import Scrollable from "@/components/Scrollable";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-dayjs.extend(duration);
 
 import ItemSelector from "@/components/ItemSelector";
-import { RemoteExamError, timerStore } from "@/shared/timer";
+import { RemoteExamError } from "@/shared/timer";
 import equal from "fast-deep-equal";
 import { useRemoteExam } from "@/shared/remoteExam";
 import { toast } from "react-toastify";
@@ -51,8 +46,8 @@ const serializeToast = (error?: RemoteExamError) => {
   return `remoteExamError_${JSON.stringify(error)}`;
 };
 
-const View: NextPage = () => {
-  const { user } = useAuth();
+const ExamView: NextPage = () => {
+  const { user, metadata } = useAuth();
   const router = useRouter();
   const { data: examList } = useExamList(true);
 
@@ -230,7 +225,9 @@ const View: NextPage = () => {
         });
         localStorage.removeItem(`exam-${router.query.path}`);
         router.replace({
-          pathname: "/exam/[path]/report",
+          pathname: `/exam/[path]/${
+            metadata?.surveyAnswered ? "report" : "feedback"
+          }`,
           query: { path: router.query.path },
         });
       } catch (err) {
@@ -241,7 +238,7 @@ const View: NextPage = () => {
         setSubmitting(false);
       }
     },
-    [router, user]
+    [router, user, metadata?.surveyAnswered]
   );
 
   const getContent = useCallback(() => {
@@ -337,9 +334,10 @@ const View: NextPage = () => {
 
   return (
     <Container
-      title={`${
-        index === 0 ? "กำลังโหลด..." : `ข้อที่ ${index}`
-      } (${examName})`}
+      title={withExamName(
+        index === 0 ? "กำลังโหลด..." : `ข้อที่ ${index}`,
+        currentExam
+      )}
       fullscreen
       scrollable={false}
     >
@@ -347,7 +345,7 @@ const View: NextPage = () => {
         backBtn
         title={
           <div className="flex flex-col">
-            <span>{examName}</span>
+            <span>{currentExam ? examName : "กำลังโหลด.."}</span>
             <span className="text-sm font-normal text-gray-200">
               {getSectionNames().join(" - ")}
             </span>
@@ -409,4 +407,4 @@ const View: NextPage = () => {
   );
 };
 
-export default View;
+export default ExamView;

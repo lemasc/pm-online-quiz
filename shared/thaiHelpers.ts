@@ -1,8 +1,5 @@
-import dayjs, { ConfigType } from "dayjs";
-import LocalizedFormat from "dayjs/plugin/localizedFormat";
-import th from "dayjs/locale/th";
-dayjs.locale(th);
-dayjs.extend(LocalizedFormat);
+import type { ConfigType } from "dayjs";
+import dayjs from "@/shared/dayjs";
 
 export function formatDateTime(dateTime: ConfigType) {
   return dayjs(dateTime).format("LL - HH:mm น.");

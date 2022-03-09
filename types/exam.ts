@@ -83,3 +83,7 @@ export type DownloadToken = {
   submissionId: string;
   admin?: boolean;
 };
+
+export type FeedbackToken = {
+  userId: string;
+};

@@ -4,11 +4,7 @@ import { nanoid } from "nanoid";
 import { siteName } from "@/shared/constants";
 import { thaiDigits } from "@/shared/thaiHelpers";
 import { getSubmission } from "@/shared/api";
-import admin from "@/shared/firebase-admin";
-import { UserMetadata } from "@/context/auth";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-dayjs.extend(duration);
+import dayjs from "@/shared/dayjs";
 import statics from "../../../../statics/index.json";
 
 const file = (name: keyof typeof statics) =>

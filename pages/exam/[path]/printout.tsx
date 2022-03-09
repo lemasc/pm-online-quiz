@@ -11,17 +11,13 @@ import { useHistoryRouter } from "@/context/history";
 import { ContentLoading } from "@/components/quiz/viewer";
 import { useAuth } from "@/context/auth";
 import Head from "next/head";
-import dayjs from "dayjs";
-import localizedFormat from "dayjs/plugin/localizedFormat";
-import th from "dayjs/locale/th";
+import dayjs from "@/shared/dayjs";
 import {
   ExportDataGenerator,
   ExportDataOutput,
   ExportExamModel,
   Result,
 } from "@/components/quiz/export";
-dayjs.extend(localizedFormat);
-dayjs.locale(th);
 
 type Props = {
   results: Result[];

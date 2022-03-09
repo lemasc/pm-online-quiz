@@ -5,7 +5,6 @@ import { onIdTokenChanged } from "firebase/auth";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
-import { immutable } from "swr/immutable/dist/immutable";
 import { auth } from "./firebase";
 
 export const useExamList = (immutable?: boolean) => {

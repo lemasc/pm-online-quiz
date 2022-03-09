@@ -1,16 +1,19 @@
 import Container, { Navbar } from "@/components/container";
 import { useAuth } from "@/context/auth";
-import { ExamLevel, ExamSubmission } from "@/types/exam";
-import { AcademicCapIcon, ClipboardListIcon } from "@heroicons/react/outline";
+import { ExamLevel } from "@/types/exam";
+import {
+  AcademicCapIcon,
+  ClipboardListIcon,
+  PencilIcon,
+} from "@heroicons/react/outline";
 
 import { NextPage } from "next";
 import { LogoutIcon } from "@heroicons/react/outline";
 import { useExamList } from "@/shared/examList";
-import { useRouter } from "next/router";
-import { ComponentProps, useCallback } from "react";
+import { ComponentProps, useState } from "react";
 import Link from "next/link";
 import { formatDateTime } from "@/shared/thaiHelpers";
-import axios from "axios";
+import NameEditModal from "@/components/nameModal";
 
 const Card = ({ href, ...props }: Omit<ComponentProps<"a">, "className">) => {
   return (
@@ -26,6 +29,8 @@ const Card = ({ href, ...props }: Omit<ComponentProps<"a">, "className">) => {
 const List: NextPage = () => {
   const { user, signOut, metadata } = useAuth();
   const { data } = useExamList();
+  const [editModal, setEditModal] = useState(false);
+  const [loadModal, setLoadModal] = useState(false);
 
   const ExamList = ({ level }: { level: keyof typeof ExamLevel }) => {
     return (
@@ -76,29 +81,45 @@ const List: NextPage = () => {
           <span className="text-sm">ออกจากระบบ</span>
         </button>
       </Navbar>
-      <div className="p-6 lg:p-8 flex flex-row gap-4 lg:gap-8 items-center bg-white border-b">
-        {user && user.photoURL ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            referrerPolicy="no-referrer"
-            src={user?.photoURL.replace("s96", "s75")}
-            className="rounded-full h-16 w-16"
-            alt="Profile"
-          />
-        ) : (
-          <div className="rounded-full h-16 w-16 bg-gray-300"></div>
-        )}
-        <div className="flex flex-col gap-1">
-          <h1 className="text-xl md:text-2xl font-bold">
-            ยินดีต้อนรับ {metadata?.nameTitle ?? user?.displayName}
-            {metadata?.name}
-          </h1>
-          <span className="text-sm md:text-base text-gray-500">
-            {metadata
-              ? `ระดับชั้น ม.${metadata.class}/${metadata.level}`
-              : `กำลังโหลดข้อมูล...`}
-          </span>
+      <div className="flex flex-col sm:flex-row p-6 lg:p-8 gap-6 bg-white border-b items-start">
+        <div className="flex flex-row gap-4 lg:gap-8 items-center flex-grow">
+          {user && user.photoURL ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              referrerPolicy="no-referrer"
+              src={user?.photoURL.replace("s96", "s75")}
+              className="rounded-full h-16 w-16"
+              alt="Profile"
+            />
+          ) : (
+            <div className="rounded-full h-16 w-16 bg-gray-300"></div>
+          )}
+          <div className="flex flex-col gap-1">
+            <h1 className="text-xl md:text-2xl font-bold">
+              ยินดีต้อนรับ {metadata?.nameTitle ?? user?.displayName}
+              {metadata?.name}
+            </h1>
+            <span className="text-sm md:text-base text-gray-500">
+              {metadata
+                ? `ระดับชั้น ม.${metadata.class}/${metadata.level}`
+                : `กำลังโหลดข้อมูล...`}
+            </span>
+          </div>
         </div>
+        <button
+          title="แก้ไขชื่อ-นามสกุล"
+          onClick={() => {
+            if (!loadModal) {
+              setLoadModal(true);
+            } else {
+              setEditModal(true);
+            }
+          }}
+          className="place-self-end sm:place-self-start px-3 py-2 flex flex-wrap justify-center items-center gap-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+        >
+          <PencilIcon className="h-5 w-5 flex-shrink-0" />
+          <span className="text-sm">แก้ไขชื่อ-นามสกุล</span>
+        </button>
       </div>
 
       <div className="flex flex-col gap-4 py-2 divide-y flex-grow">
@@ -154,6 +175,7 @@ const List: NextPage = () => {
           </div>
         </section>
       </div>
+      {loadModal && <NameEditModal show={editModal} setShow={setEditModal} />}
     </Container>
   );
 };

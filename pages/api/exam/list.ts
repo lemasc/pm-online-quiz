@@ -14,9 +14,6 @@ import { NextApiHandler } from "next";
 const db = admin.firestore();
 
 const examList: NextApiHandler<ExamListModel> = async (req, res) => {
-  if (typeof req.token.class !== "number") {
-    return void res.status(428).end();
-  }
   try {
     const rawExam = await readFile<ExamAPIItem[]>("index.json");
     const rawSubmission = await db

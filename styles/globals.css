@@ -154,5 +154,5 @@ table > tbody > tr {
 }
 
 input[type="radio"] {
-  @apply text-quiz-blue-500 ring-quiz-blue-500;
+  @apply text-quiz-blue-500 focus:ring-quiz-blue-500;
 }
