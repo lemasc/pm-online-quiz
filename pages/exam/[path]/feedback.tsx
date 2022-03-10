@@ -133,7 +133,7 @@ const ExamFeedback: NextPage = () => {
             หากคุณข้ามการตอบแบบประเมินในครั้งนี้
             หน้าต่างแบบประเมินจะแสดงในการสอบครั้งต่อไป
           </p>
-          <p>ต้องการข้ามการทำแบบประเมิน ใช่หรือไม่?</p>
+          <p>ต้องการข้ามการทำแบบประเมินหรือไม่?</p>
           <div className="items-center justify-center flex flex-col sm:grid-cols-2 sm:grid gap-3 sm:gap-4 w-full">
             <button
               type="button"

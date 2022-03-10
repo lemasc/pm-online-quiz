@@ -33,7 +33,7 @@ export default function NameEditModal({
   return (
     <ModalComponent
       size="max-w-2xl"
-      title={`ส่งคำขอเปลี่ยนชื่อ-นามสกุล`}
+      title={`ส่งคำขอแก้ไขชื่อ-นามสกุลไม่ถูกต้อง`}
       show={show}
       onClose={() => setShow(false)}
       titleClass="border-b font-medium font-prompt"

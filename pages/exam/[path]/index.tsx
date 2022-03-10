@@ -115,18 +115,20 @@ const ExamLoading: NextPage = () => {
                 <u>ข้อปฏิบัติในการทำแบบทดสอบ</u>
               </b>
               <ol>
-                <li>
-                  <div className="content-sublist space-y-2">
-                    แบบทดสอบนี้มีทั้งหมด {data.names.length || 1} ส่วน
-                    {data.names.length > 0 && (
-                      <ul>
-                        {data.names.map((name) => (
-                          <li key={name}>{name}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </li>
+                {data.names.length > 2 && (
+                  <li>
+                    <div className="content-sublist space-y-2">
+                      แบบทดสอบนี้มีทั้งหมด {data.names.length} ส่วน
+                      {data.names.length > 0 && (
+                        <ul>
+                          {data.names.map((name) => (
+                            <li key={name}>{name}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </li>
+                )}
                 <li>
                   <p className="content-sublist">
                     แบบทดสอบชุดเป็นแบบเลือกตอบ{" "}

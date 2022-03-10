@@ -1,4 +1,4 @@
-import React, { useState, ComponentProps } from "react";
+import React, { useState, ComponentProps, Fragment } from "react";
 import { PieChart as Chart } from "react-minimal-pie-chart";
 
 type Props = {
@@ -31,7 +31,7 @@ function PieChart(props: Props) {
       animate
       label={({ x, y, dx, dy, dataEntry }) =>
         dataEntry.percentage >= 20 ? (
-          <>
+          <Fragment key={dataEntry.title}>
             <text
               x={x}
               y={y}
@@ -63,7 +63,7 @@ function PieChart(props: Props) {
             >
               {dataEntry.title}
             </text>
-          </>
+          </Fragment>
         ) : null
       } /*
       labelStyle={{

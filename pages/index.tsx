@@ -21,7 +21,7 @@ const Home: NextPage = () => {
       <div className="flex flex-col lg:flex-row h-screen w-full bg-[#e7965b]">
         <div className="lg:relative flex flex-col items-center justify-center flex-grow lg:p-4">
           <div className="max-w-[100vh]">
-            <Image src={landing} className="z-1" alt="Landing" />
+            <Image src={landing} className="z-1" alt="Landing" priority />
           </div>
           <div className="hidden lg:block mx-8 text-center font-sarabun text-black absolute bottom-5 text-sm">
             สงวนลิขสิทธิ์ &copy; 2564-2565 คณะกรรมการนักเรียน
