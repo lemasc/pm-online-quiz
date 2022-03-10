@@ -68,7 +68,7 @@ const certificate: NextApiHandler = async (req, res) => {
     doc
       .font("Regular")
       .fontSize(22)
-      .text(thaiDigits(submittedTime.getDate()), -11, 330, {
+      .text(thaiDigits(submittedTime.getDate()), -11, 365, {
         align: "center",
       });
 
