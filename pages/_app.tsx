@@ -14,10 +14,11 @@ import "../styles/content.css";
 import "../styles/print.css";
 
 import MainProvider from "@/context/index";
+import LogRocket from "logrocket";
 
 function App({ Component, pageProps }: AppProps) {
-  /*process.env.NODE_ENV !== "development" &&
-    LogRocket.init("sg61xt/online-quiz");*/
+  process.env.NODE_ENV !== "development" &&
+    LogRocket.init("sg61xt/online-quiz");
   return (
     <MainProvider>
       <Component {...pageProps} />

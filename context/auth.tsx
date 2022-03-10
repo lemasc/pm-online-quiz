@@ -9,6 +9,7 @@ import {
 import { auth } from "../shared/firebase";
 import { useRouter } from "next/router";
 import { useDocument, Document } from "swr-firestore-v9";
+import LogRocket from "logrocket";
 
 export type UserMetadata = {
   studentId: number;
@@ -85,10 +86,10 @@ export function useProvideAuth(): IAuthContext {
   useEffect(() => {
     return auth.onIdTokenChanged(async (curUser) => {
       if (curUser) {
-        /*LogRocket.identify(curUser.uid, {
+        LogRocket.identify(curUser.uid, {
           name: curUser.displayName ?? "",
           email: curUser.email ?? "",
-        });*/
+        });
         setUser(curUser);
       } else {
         setUser(null);
