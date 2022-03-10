@@ -18,6 +18,9 @@ import {
   ExportExamModel,
   Result,
 } from "@/components/quiz/export";
+import Image from "next/image";
+import printhead from "../../../public/printhead.jpg";
+import { siteName } from "@/shared/constants";
 
 type Props = {
   results: Result[];
@@ -204,6 +207,13 @@ export default function PrintPage({ results, submission, name, admin }: Props) {
       ) : (
         <div className="flex-grow flex flex-col items-center p-4 md:p-8 lg:p-12 bg-gray-400 print:p-0 print:bg-white">
           <article className="font-sarabun content bg-white p-10 lg:p-14 print:p-0 max-w-5xl print:max-w-none">
+            <div>
+              <Image
+                src={printhead}
+                alt={"โครงการ" + siteName}
+                className="border border-gray-400"
+              />
+            </div>
             <div className="flex flex-row gap-4 items-start pt-4">
               <div className="flex flex-grow flex-col gap-4">
                 <h1 className="flex-grow text-quiz-blue-600">
