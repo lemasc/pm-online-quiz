@@ -4,7 +4,6 @@ import { nanoid } from "nanoid";
 import { siteName } from "@/shared/constants";
 import { thaiDigits } from "@/shared/thaiHelpers";
 import { getSubmission } from "@/shared/api";
-import dayjs from "@/shared/dayjs";
 import statics from "../../../../statics/index.json";
 
 const file = (name: string) => {
@@ -57,11 +56,6 @@ const certificate: NextApiHandler = async (req, res) => {
       width: Math.ceil(doc.page.width),
       height: Math.ceil(doc.page.height),
     });
-    /*doc.image(file("watermark"), 0, 0, {
-      width: Math.ceil(doc.page.width),
-      height: Math.ceil(doc.page.height),
-    });
-    */
 
     doc
       .font("Bold")
@@ -71,11 +65,10 @@ const certificate: NextApiHandler = async (req, res) => {
       });
     doc.font("Bold").fontSize(22).text(subject, 583, 259);
 
-    // Original Value 22,-10,330
     doc
       .font("Regular")
-      .fontSize(16)
-      .text(thaiDigits(dayjs(submittedTime).get("d")), -11, 335, {
+      .fontSize(22)
+      .text(thaiDigits(submittedTime.getDate()), -11, 330, {
         align: "center",
       });
 

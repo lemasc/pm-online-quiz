@@ -95,7 +95,12 @@ export default function Container({
                 คณะกรรมการนักเรียน โรงเรียนมัธยมสาธิตวัดพระศรีมหาธาตุ
               </span>
               <div className="flex flex-row flex-wrap gap-2 md:gap-6">
-                <a href="#" className="underline">
+                <a
+                  href={process.env.NEXT_PUBLIC_ISSUE_FORM_URL}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="underline"
+                >
                   แจ้งปัญหาการใช้งาน
                 </a>
                 <a href="#" className="underline">

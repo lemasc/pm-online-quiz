@@ -44,7 +44,12 @@ const Home: NextPage = () => {
             />
           </div>
           <div className="flex flex-row flex-wrap gap-2 lg:gap-6 text-sm justify-center">
-            <a href="#" className="underline">
+            <a
+              href={process.env.NEXT_PUBLIC_ISSUE_FORM_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="underline"
+            >
               แจ้งปัญหาการใช้งาน
             </a>
             <a href="#" className="underline">
