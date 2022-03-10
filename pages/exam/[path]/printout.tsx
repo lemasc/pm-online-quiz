@@ -150,11 +150,10 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
       },
     };
   } catch (err) {
+    console.error(err);
     return {
       props: {},
-      redirect: {
-        destination: "/home",
-      },
+      notFound: true,
     };
   }
 };
