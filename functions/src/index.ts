@@ -9,7 +9,7 @@ import * as admin from "firebase-admin";
 dotenv.config();
 admin.initializeApp();
 
-const db = admin.firestore();
+const db = admin.firestore;
 const auth = admin.auth();
 
 type UserProfile = {
@@ -53,9 +53,42 @@ export const loadUserData = functions.auth.user().onCreate(async (user) => {
         class: data.items[0].class,
       });
       delete data.items[0]["#"];
-      db.collection("users").doc(user.uid).set(data.items[0]);
+      db().collection("users").doc(user.uid).set(data.items[0]);
     } catch (err) {
       console.error(err);
     }
+  } else {
+    functions.logger.error(
+      `Warning: Cannot parse student ID email. ${user.email}`
+    );
   }
+
+  // Update summary
+  return db()
+    .collection("summary")
+    .doc("summary")
+    .set(
+      {
+        users: admin.firestore.FieldValue.increment(1),
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      {
+        merge: true,
+      }
+    );
+});
+
+exports.removeUsers = functions.auth.user().onDelete(async () => {
+  return db()
+    .collection("summary")
+    .doc("summary")
+    .set(
+      {
+        users: admin.firestore.FieldValue.increment(-1),
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      {
+        merge: true,
+      }
+    );
 });

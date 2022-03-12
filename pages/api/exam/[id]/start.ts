@@ -1,12 +1,14 @@
 import { NextApiHandler } from "next";
-
 import { ExamStartPayload, GenericExamModel } from "@/types/exam";
 import { nanoid } from "nanoid";
 import { withAPISession } from "@/shared/session";
 import dayjs from "dayjs";
 import { HASH_LENGTH, readFile, withFirebase } from "@/shared/api";
 import { itemToCharCode } from "@/shared/api/item";
+import admin from "@/shared/firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 
+const db = admin.firestore();
 /**
  * Shuffle Array
  *
@@ -91,8 +93,8 @@ const handler: NextApiHandler<ExamStartPayload> = async (req, res) => {
   }
   try {
     const data = await processSection(req.query.id);
-    // Max internet delay 1500ms
-    const startTime = dayjs().add(1500, "milliseconds");
+    // Max internet delay 2000ms
+    const startTime = dayjs().add(2000, "milliseconds");
     req.session.exam = {
       ...(req.session.exam || {}),
       [req.query.id]: {
@@ -108,6 +110,19 @@ const handler: NextApiHandler<ExamStartPayload> = async (req, res) => {
         uid: req.token.uid,
       },
     };
+    await db
+      .collection("summary")
+      .doc("summary")
+      .set(
+        {
+          startExam: FieldValue.increment(1),
+          timestamp: FieldValue.serverTimestamp(),
+        },
+        {
+          merge: true,
+        }
+      );
+
     await req.session.save();
     res.status(200).json({
       // Data is an obfuscated exam payload that can be send to the client safely.
