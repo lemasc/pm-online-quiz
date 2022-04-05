@@ -43,11 +43,12 @@ const ExamLoading: NextPage = () => {
         try {
           isProcessing.current = true;
           const token = await user.getIdToken();
-          await restoreSession(router.query.path, token);
+          throw new Error("End of exam submission");
+          /*await restoreSession(router.query.path, token);
           router.replace({
             pathname: "/exam/[path]/view",
             query: { path: router.query.path },
-          });
+          });*/
         } catch (err) {
           setLoading(false);
         } finally {
@@ -171,14 +172,15 @@ const ExamLoading: NextPage = () => {
             </p>
             <div className="flex flex-col items-center justify-center">
               <button
-                title="เริ่มทำแบบทดสอบ"
+                title="หมดเวลาการทำแบบทดสอบ"
+                disabled
                 onClick={() => {
                   startNewSession();
                 }}
-                className="bg-green-600 hover:bg-green-700 focus:outline-none px-6 py-3 font-prompt font-bold rounded text-lg text-white"
+                className="bg-gray-200 text-gray-700 focus:outline-none px-6 py-3 font-prompt font-bold rounded text-lg cursor-not-allowed"
               >
                 <ChevronRightIcon className="mr-2 -mt-0.5 w-6 h-6 inline" />
-                เริ่มทำแบบทดสอบ
+                หมดเวลาการทำแบบทดสอบ
               </button>
             </div>
           </div>
