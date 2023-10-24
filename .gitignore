@@ -44,3 +44,4 @@ sentry.properties
 
 # Local Netlify folder
 .netlify
+.env*.local

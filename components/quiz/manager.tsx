@@ -139,7 +139,7 @@ export default function QuizManager({
   const removeItem = (path?: string, typeString?: string) => {
     if (!typeString) typeString = type.toLowerCase();
     if (!confirm(`Are you sure you want to delete this ${typeString}?`)) return;
-    deleteDoc(`/exam/${constructPath(path)}`);
+    deleteDoc(`/exam-demo/${constructPath(path)}`);
   };
 
   const addSection = () => {

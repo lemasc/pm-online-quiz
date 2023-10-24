@@ -1,16 +1,6 @@
-import { NextPage } from "next";
-import Head from "next/head";
 import Viewer, { ViewerClass } from "@/components/quiz/viewer";
-import {
-  CheckIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  RefreshIcon,
-} from "@heroicons/react/outline";
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/router";
-import { QuizModel } from "@/types/index";
-import { useDocument } from "swr-firestore-v9";
+import { CONTENT_INDEX } from "@/shared/constants";
+import { useExamQuery } from "@/shared/exam";
 import {
   quizItemStore,
   quizStore,
@@ -18,8 +8,18 @@ import {
   setItems,
   useQuizStoreSync,
 } from "@/shared/store";
-import { useExamQuery } from "@/shared/exam";
-import { CONTENT_INDEX } from "@/shared/constants";
+import { QuizModel } from "@/types/index";
+import {
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  RefreshIcon,
+} from "@heroicons/react/outline";
+import { NextPage } from "next";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useRef, useState } from "react";
+import { useDocument } from "swr-firestore-v9";
 
 const Page: NextPage = () => {
   const editorRef = useRef<ViewerClass>();
@@ -32,7 +32,7 @@ const Page: NextPage = () => {
   const [updateTime, setUpdateTime] = useState<Date | undefined>();
 
   const { data } = useDocument<QuizModel>(
-    basePath ? `/exam/${basePath}` : null,
+    basePath ? `/exam-demo/${basePath}` : null,
     {
       listen: true,
     }

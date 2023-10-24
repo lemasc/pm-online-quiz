@@ -14,7 +14,7 @@ const Page: NextPage = () => {
 
   const { basePath, constructPath } = useExamQuery();
 
-  const getFetchKey = () => (basePath ? `exam/${basePath}` : undefined);
+  const getFetchKey = () => (basePath ? `exam-demo/${basePath}` : undefined);
   const { data } = useDocument<GenericExamModel>(getFetchKey() || null, {
     listen: true,
   });

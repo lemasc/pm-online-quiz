@@ -1,25 +1,25 @@
-import { NextPage } from "next";
 import Editor from "@/components/quiz/editor";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  EyeIcon,
-  TrashIcon,
-} from "@heroicons/react/outline";
-import { useCallback, useEffect, useRef } from "react";
-import { useRouter } from "next/router";
-import { QuizItem, QuizModel } from "@/types/index";
-import { useDocument, updateDoc } from "swr-firestore-v9";
+import { useHistoryRouter } from "@/context/history";
+import { CONTENT_INDEX } from "@/shared/constants";
+import { useExamQuery } from "@/shared/exam";
 import {
   quizStore,
   setIndex,
   setItems,
   useQuizStoreSync,
 } from "@/shared/store";
-import { useExamQuery } from "@/shared/exam";
+import { QuizItem, QuizModel } from "@/types/index";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  EyeIcon,
+  TrashIcon,
+} from "@heroicons/react/outline";
+import { NextPage } from "next";
 import Head from "next/head";
-import { CONTENT_INDEX } from "@/shared/constants";
-import { useHistoryRouter } from "@/context/history";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useRef } from "react";
+import { updateDoc, useDocument } from "swr-firestore-v9";
 
 const Page: NextPage = () => {
   const editorRef = useRef<Editor>();
@@ -33,7 +33,7 @@ const Page: NextPage = () => {
   const { basePath, shallowReplace, goNext, goPrevious } = useExamQuery();
 
   const { data } = useDocument<QuizModel>(
-    basePath ? `/exam/${basePath}` : null,
+    basePath ? `/exam-demo/${basePath}` : null,
     {
       listen: true,
     }
@@ -99,7 +99,7 @@ const Page: NextPage = () => {
       };
       if (items.has(CONTENT_INDEX))
         model.content = items.get(CONTENT_INDEX)?.content;
-      updateDoc(`exam/${basePath}`, model);
+      updateDoc(`exam-demo/${basePath}`, model);
       localStorage.setItem("moel", JSON.stringify(model));
       console.log("Data saved at", new Date().toLocaleString());
       touchedTimeout.current = undefined;

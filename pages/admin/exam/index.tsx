@@ -1,11 +1,11 @@
 import QuizManager, { Buttons } from "@/components/quiz/manager";
 import { ExamLevel, GenericExamModel } from "@/types/exam";
 import { NextPage } from "next";
-import { useCollection } from "swr-firestore-v9";
 import Link from "next/link";
+import { useCollection } from "swr-firestore-v9";
 
 const Page: NextPage = () => {
-  const { data } = useCollection<GenericExamModel>("/exam", {
+  const { data } = useCollection<GenericExamModel>("/exam-demo", {
     listen: true,
     orderBy: "name",
   });

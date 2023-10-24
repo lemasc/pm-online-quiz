@@ -1,24 +1,24 @@
-import "tailwindcss/tailwind.css";
+import "katex/dist/katex.min.css";
 import type { AppProps } from "next/app";
 import "react-toastify/dist/ReactToastify.css";
-import "@toast-ui/editor/dist/toastui-editor.css";
-import "katex/dist/katex.min.css";
+import "tailwindcss/tailwind.css";
+// Modify toastui-editor to scope button styles, fixing conflict with global tailwincss styles.
+import "../styles/toastui-editor.css";
 
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/virtual";
 
-import "../styles/globals.css";
 import "../styles/content.css";
+import "../styles/globals.css";
 import "../styles/print.css";
 
 import MainProvider from "@/context/index";
-import LogRocket from "logrocket";
 
 function App({ Component, pageProps }: AppProps) {
-  process.env.NODE_ENV !== "development" &&
-    LogRocket.init("sg61xt/online-quiz");
+  /*process.env.NODE_ENV !== "development" &&
+    LogRocket.init("sg61xt/online-quiz");*/
   return (
     <MainProvider>
       <Component {...pageProps} />

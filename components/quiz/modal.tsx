@@ -1,12 +1,12 @@
-import { useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-import { GenericExamModel } from "@/types/exam";
-import { Document, setDoc } from "swr-firestore-v9";
-import { minifiedFields } from "@/shared/firebase";
-import { nanoid } from "nanoid";
 import { useExamQuery } from "@/shared/exam";
+import { minifiedFields } from "@/shared/firebase";
+import { GenericExamModel } from "@/types/exam";
+import { nanoid } from "nanoid";
+import { Document, setDoc } from "swr-firestore-v9";
 const ModalComponent = dynamic(() => import("@/components/modal"));
 
 export interface ModalConfig {
@@ -65,7 +65,7 @@ export default function ExamModal({
     );
     try {
       setDoc(
-        `/exam/${constructPath(
+        `/exam-demo/${constructPath(
           config.path,
           config.data ? undefined : nanoid()
         )}`,

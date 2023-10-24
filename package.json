@@ -15,9 +15,8 @@
     "@heroicons/react": "^1.0.5",
     "@netlify/plugin-nextjs": "^4.2.7",
     "@next/bundle-analyzer": "^12.1.0",
-    "@react-pdf/renderer": "^2.1.1",
     "@sentry/nextjs": "^6.18.0",
-    "@tailwindcss/forms": "^0.5.0",
+    "@tailwindcss/forms": "^0.5.6",
     "@toast-ui/react-editor": "^3.1.2",
     "adm-zip": "^0.5.9",
     "axios": "^0.25.0",
@@ -60,7 +59,8 @@
     "eslint-config-next": "12.0.10",
     "mime": "^3.0.0",
     "postcss": "^8.4.6",
-    "tailwindcss": "^3.0.18",
+    "tailwindcss": "^3.3.3",
     "typescript": "^4.5.5"
-  }
+  },
+  "packageManager": "yarn@4.0.0"
 }
