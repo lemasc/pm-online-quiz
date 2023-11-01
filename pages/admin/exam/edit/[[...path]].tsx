@@ -43,6 +43,7 @@ const Page: NextPage = () => {
     if (!data) return;
     if (data.exists && data.items) {
       const existingState = quizStore.getState().currentItem;
+      console.log(existingState);
       if (data.items[existingState]) {
         // Editor never renders again. This is very bad practice but we need to explictly set it.
         editorRef.current?.setContent(data.items[existingState].content);
@@ -97,10 +98,11 @@ const Page: NextPage = () => {
           )
         ),
       };
-      if (items.has(CONTENT_INDEX))
+      if (items.has(CONTENT_INDEX)) {
         model.content = items.get(CONTENT_INDEX)?.content;
+      }
       updateDoc(`exam-demo/${basePath}`, model);
-      localStorage.setItem("moel", JSON.stringify(model));
+      localStorage.setItem("model", JSON.stringify({ basePath: model }));
       console.log("Data saved at", new Date().toLocaleString());
       touchedTimeout.current = undefined;
     }, 2500);
@@ -205,7 +207,7 @@ const Page: NextPage = () => {
         </title>
       </Head>
       <div className="min-h-screen h-full">
-        <div className="p-4 flex flex-row gap-4 items-center h-20">
+        <div className="px-4 py-5 flex flex-col sm:flex-row gap-4 items-center">
           <div className="flex flex-row gap-4 flex-grow items-center">
             <button
               className="flex flex-row gap-2 items-center hover:underline"
@@ -226,29 +228,29 @@ const Page: NextPage = () => {
                 ? "Section Content"
                 : `Question ${index} of ${size}`}
             </span>
-            <div className="flex flex-grow items-center justify-center gap-4">
-              <button
-                className={`font-prompt hover:underline ${
-                  index === CONTENT_INDEX ? "font-bold" : ""
-                }`}
-                onClick={() => showContent()}
-              >
-                Content
-              </button>
-              <button
-                className={`font-prompt hover:underline ${
-                  index !== CONTENT_INDEX ? "font-bold" : ""
-                }`}
-                onClick={() => {
-                  const item = parseInt(router.query.item as string);
-                  if (!isNaN(item)) setIndex(() => item);
-                }}
-              >
-                Items
-              </button>
-            </div>
           </div>
-          <div className="flex w-48 justify-end gap-3 text-white">
+          <div className="bg-gray-100 px-6 py-4 rounded flex flex-grow items-center justify-center divide-x divide-gray-500">
+            <button
+              className={`font-prompt hover:underline px-4 ${
+                index === CONTENT_INDEX ? "font-bold" : ""
+              }`}
+              onClick={() => showContent()}
+            >
+              Content
+            </button>
+            <button
+              className={`font-prompt hover:underline px-4 ${
+                index !== CONTENT_INDEX ? "font-bold" : ""
+              }`}
+              onClick={() => {
+                const item = parseInt(router.query.item as string);
+                if (!isNaN(item)) setIndex(() => item);
+              }}
+            >
+              Items
+            </button>
+          </div>
+          <div className="flex w-48 justify-center sm:justify-end gap-3 text-white">
             {index !== CONTENT_INDEX && (
               <>
                 {index > 1 && (
