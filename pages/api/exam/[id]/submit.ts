@@ -8,7 +8,6 @@ import {
 } from "@/shared/api";
 import admin from "@/shared/firebase-admin";
 import { ExamSubmission, ExamSubmitBody, GenericExamModel } from "@/types/exam";
-import { FieldValue } from "firebase-admin/firestore";
 
 type Answer = {
   item: string;
@@ -65,6 +64,7 @@ const submit: ExamApiHandler<ExamQuery, ExamSubmitBody> = async (req, res) => {
         .collection("submissions")
         .doc(req.query.id)
         .set(payload);
+      /*
       await db
         .collection("summary")
         .doc("summary")
@@ -76,7 +76,7 @@ const submit: ExamApiHandler<ExamQuery, ExamSubmitBody> = async (req, res) => {
           {
             merge: true,
           }
-        );
+        );*/
       delete req.session.exam?.[req.query.id];
       await req.session.save();
       res.status(200).end();

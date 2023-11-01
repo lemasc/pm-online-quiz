@@ -1,15 +1,14 @@
-import { useState, useEffect, useContext, createContext, useRef } from "react";
 import {
-  getRedirectResult,
   GoogleAuthProvider,
-  signInWithRedirect,
   User,
+  getRedirectResult,
+  signInWithRedirect,
 } from "firebase/auth";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
-import { auth } from "../shared/firebase";
 import { useRouter } from "next/router";
-import { useDocument, Document } from "swr-firestore-v9";
-import LogRocket from "logrocket";
+import { Document } from "swr-firestore-v9";
+import { auth } from "../shared/firebase";
 
 export type UserMetadata = {
   studentId: number;
@@ -42,12 +41,6 @@ export const useAuth = (): IAuthContext => {
 export function useProvideAuth(): IAuthContext {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const { data: metadata } = useDocument<UserMetadata>(
-    user ? `/users/${user.uid}` : null,
-    {
-      listen: true,
-    }
-  );
 
   const signInWithGoogle = async (teacher?: boolean): Promise<void> => {
     const provider = new GoogleAuthProvider();
@@ -60,6 +53,7 @@ export function useProvideAuth(): IAuthContext {
   const signOut = async (): Promise<void> => {
     await auth.signOut();
     setUser(null);
+    router.replace("/");
   };
 
   const [ready, setReady] = useState(false);
@@ -68,28 +62,20 @@ export function useProvideAuth(): IAuthContext {
     if (!router.isReady) return;
     if (readyRef.current) clearTimeout(readyRef.current);
     readyRef.current = setTimeout(() => {
-      const ready = !(
-        (user && metadata && !metadata.exists) ||
-        (user === undefined && metadata === undefined)
-      );
-      if (ready && !router.pathname.includes("/admin")) {
-        if (!user && !metadata && router.pathname !== "/") {
+      if (user && !router.pathname.includes("/admin")) {
+        if (!user && router.pathname !== "/") {
           router.replace("/");
-        } else if (user && metadata && router.pathname == "/") {
+        } else if (user && router.pathname == "/") {
           router.replace("/home");
         }
       }
-      setReady(ready);
+      setReady(true);
     }, 2000);
-  }, [metadata, router, user]);
+  }, [router, user]);
 
   useEffect(() => {
     return auth.onIdTokenChanged(async (curUser) => {
       if (curUser) {
-        LogRocket.identify(curUser.uid, {
-          name: curUser.displayName ?? "",
-          email: curUser.email ?? "",
-        });
         setUser(curUser);
       } else {
         setUser(null);
@@ -103,7 +89,7 @@ export function useProvideAuth(): IAuthContext {
 
   return {
     user,
-    metadata,
+    metadata: null,
     signInWithGoogle,
     signOut,
     ready,

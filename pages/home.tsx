@@ -8,14 +8,14 @@ import {
   PencilIcon,
 } from "@heroicons/react/outline";
 
-import { NextPage } from "next";
-import { LogoutIcon } from "@heroicons/react/outline";
-import { useExamList } from "@/shared/examList";
-import { ComponentProps, Fragment, useState } from "react";
-import Link from "next/link";
-import { formatDateTime } from "@/shared/thaiHelpers";
 import NameEditModal from "@/components/nameModal";
+import { useExamList } from "@/shared/examList";
+import { formatDateTime } from "@/shared/thaiHelpers";
 import { Disclosure } from "@headlessui/react";
+import { LogoutIcon } from "@heroicons/react/outline";
+import { NextPage } from "next";
+import Link from "next/link";
+import { ComponentProps, useState } from "react";
 
 const Card = ({ href, ...props }: Omit<ComponentProps<"a">, "className">) => {
   return (
@@ -82,16 +82,17 @@ const NameList = ({ title, names }: { title: string; names: string[] }) => {
 };
 
 const List: NextPage = () => {
-  const { user, signOut, metadata } = useAuth();
+  const { signOut } = useAuth();
   const { data } = useExamList();
   const [editModal, setEditModal] = useState(false);
   const [loadModal, setLoadModal] = useState(false);
 
   const ExamList = ({ level }: { level: keyof typeof ExamLevel }) => {
+    const examData = data?.exam.filter((d) => d.level === level);
     return (
       <>
-        {data && data.exam && data.exam.length > 0
-          ? data.exam
+        {examData && examData.length > 0
+          ? examData
               .filter((d) => d.level === level)
               .map((d) => (
                 <Card key={d.id} href={`/exam/${d.id}`}>
@@ -138,26 +139,13 @@ const List: NextPage = () => {
       </Navbar>
       <div className="flex flex-col sm:flex-row p-6 lg:p-8 gap-6 bg-white border-b items-start">
         <div className="flex flex-row gap-4 lg:gap-8 items-center flex-grow">
-          {user && user.photoURL ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              referrerPolicy="no-referrer"
-              src={user?.photoURL.replace("s96", "s75")}
-              className="rounded-full h-16 w-16"
-              alt="Profile"
-            />
-          ) : (
-            <div className="rounded-full h-16 w-16 bg-gray-300"></div>
-          )}
+          <div className="rounded-full h-16 w-16 bg-gray-300"></div>
           <div className="flex flex-col gap-1">
             <h1 className="text-xl md:text-2xl font-bold">
-              ยินดีต้อนรับ {metadata?.nameTitle ?? user?.displayName}
-              {metadata?.name}
+              ยินดีต้อนรับ ผู้ใช้งาน DEMO
             </h1>
             <span className="text-sm md:text-base text-gray-500">
-              {metadata
-                ? `ระดับชั้น ม.${metadata.class}/${metadata.level}`
-                : `กำลังโหลดข้อมูล...`}
+              ระดับชั้น ม.6/1
             </span>
           </div>
         </div>

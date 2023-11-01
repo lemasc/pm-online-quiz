@@ -1,18 +1,17 @@
 import { NoMenuContainer as Container } from "@/components/container";
-import { useAuth } from "@/context/auth";
 import { siteName } from "@/shared/constants";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { useRouter } from "next/router";
-import GoogleButton from "react-google-button";
 import landing from "../public/web.jpeg";
 
+import { auth } from "@/shared/firebase";
+import { signInAnonymously } from "firebase/auth";
+import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 
 const Home: NextPage = () => {
   const { replace } = useRouter();
-  const { signInWithGoogle } = useAuth();
   return (
     <Container>
       <Head>
@@ -31,17 +30,20 @@ const Home: NextPage = () => {
         <div className="bg-white rounded-t-xl lg:rounded-t-none lg:rounded-l-xl shadow flex flex-col gap-8 text-center items-center justify-center font-prompt px-10 py-8">
           <h1 className="text-3xl font-bold pt-4">{siteName}</h1>
           <div className="flex flex-col gap-4 items-center justify-center">
-            <span>เข้าสู่ระบบด้วยอีเมลโรงเรียน (PNRU)</span>
-            <GoogleButton
+            <span>เข้าสู่ระบบด้วยบัญชีชั่วคราว</span>
+            <button
+              className="bg-orange-500 hover:bg-orange-600 rounded-lg px-6 py-3 text-white w-full"
               onClick={async () => {
                 try {
-                  await signInWithGoogle();
+                  await signInAnonymously(auth);
                   replace("/home");
                 } catch (err) {
                   toast.error("ไม่สามารถเข้าสู่ระบบได้");
                 }
               }}
-            />
+            >
+              เข้าสู่ระบบ
+            </button>
           </div>
           <div className="flex flex-row flex-wrap gap-2 lg:gap-6 text-sm justify-center">
             <a

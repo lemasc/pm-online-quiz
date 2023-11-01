@@ -1,41 +1,40 @@
+import Scrollable from "@/components/Scrollable";
 import Container, { Navbar, withExamName } from "@/components/container";
-import axios from "axios";
-import { NextPage } from "next";
 import Viewer, {
   ContentLoading,
   ContentViewer,
   Timer,
   ViewerClass,
 } from "@/components/quiz/viewer";
+import { CONTENT_INDEX } from "@/shared/constants";
+import { useExamQuery } from "@/shared/exam";
+import {
+  QuizState,
+  quizItemStore,
+  quizStore,
+  setIndex,
+  setItems,
+  useQuizStoreSync,
+} from "@/shared/store";
+import { ExamLevel, ExamStartPayload, ExamSubmitBody } from "@/types/exam";
 import {
   CheckIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   RefreshIcon,
 } from "@heroicons/react/outline";
-import { useCallback, useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { NextPage } from "next";
 import { useRouter } from "next/router";
-import {
-  quizItemStore,
-  QuizState,
-  quizStore,
-  setIndex,
-  setItems,
-  useQuizStoreSync,
-} from "@/shared/store";
-import { useExamQuery } from "@/shared/exam";
-import { CONTENT_INDEX } from "@/shared/constants";
-import { ExamLevel, ExamStartPayload, ExamSubmitBody } from "@/types/exam";
-import React from "react";
-import Scrollable from "@/components/Scrollable";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import ItemSelector from "@/components/ItemSelector";
-import { RemoteExamError } from "@/shared/timer";
-import equal from "fast-deep-equal";
-import { useRemoteExam } from "@/shared/remoteExam";
-import { toast } from "react-toastify";
 import { useAuth } from "@/context/auth";
 import { useExamList } from "@/shared/examList";
+import { useRemoteExam } from "@/shared/remoteExam";
+import { RemoteExamError } from "@/shared/timer";
+import equal from "fast-deep-equal";
+import { toast } from "react-toastify";
 
 const toAnswers = (items: QuizState["items"]) =>
   Array.from(items.entries())
@@ -225,9 +224,7 @@ const ExamView: NextPage = () => {
         });
         localStorage.removeItem(`exam-${router.query.path}`);
         router.replace({
-          pathname: `/exam/[path]/${
-            metadata?.surveyAnswered ? "report" : "feedback"
-          }`,
+          pathname: `/exam/[path]/report`,
           query: { path: router.query.path },
         });
       } catch (err) {

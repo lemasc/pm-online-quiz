@@ -17,8 +17,6 @@ import "../styles/print.css";
 import MainProvider from "@/context/index";
 
 function App({ Component, pageProps }: AppProps) {
-  /*process.env.NODE_ENV !== "development" &&
-    LogRocket.init("sg61xt/online-quiz");*/
   return (
     <MainProvider>
       <Component {...pageProps} />

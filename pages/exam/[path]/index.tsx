@@ -43,12 +43,11 @@ const ExamLoading: NextPage = () => {
         try {
           isProcessing.current = true;
           const token = await user.getIdToken();
-          throw new Error("End of exam submission");
-          /*await restoreSession(router.query.path, token);
+          await restoreSession(router.query.path, token);
           router.replace({
             pathname: "/exam/[path]/view",
             query: { path: router.query.path },
-          });*/
+          });
         } catch (err) {
           setLoading(false);
         } finally {
@@ -116,20 +115,6 @@ const ExamLoading: NextPage = () => {
                 <u>ข้อปฏิบัติในการทำแบบทดสอบ</u>
               </b>
               <ol>
-                {data.names.length > 2 && (
-                  <li>
-                    <div className="content-sublist space-y-2">
-                      แบบทดสอบนี้มีทั้งหมด {data.names.length} ส่วน
-                      {data.names.length > 0 && (
-                        <ul>
-                          {data.names.map((name) => (
-                            <li key={name}>{name}</li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  </li>
-                )}
                 <li>
                   <p className="content-sublist">
                     แบบทดสอบชุดเป็นแบบเลือกตอบ{" "}
@@ -172,15 +157,14 @@ const ExamLoading: NextPage = () => {
             </p>
             <div className="flex flex-col items-center justify-center">
               <button
-                title="หมดเวลาการทำแบบทดสอบ"
-                disabled
+                title="เริ่มทำแบบทดสอบ"
                 onClick={() => {
                   startNewSession();
                 }}
-                className="bg-gray-200 text-gray-700 focus:outline-none px-6 py-3 font-prompt font-bold rounded text-lg cursor-not-allowed"
+                className="bg-green-600 hover:bg-green-700 focus:outline-none px-6 py-3 font-prompt font-bold rounded text-lg text-white"
               >
                 <ChevronRightIcon className="mr-2 -mt-0.5 w-6 h-6 inline" />
-                หมดเวลาการทำแบบทดสอบ
+                เริ่มทำแบบทดสอบ
               </button>
             </div>
           </div>

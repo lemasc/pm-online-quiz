@@ -2,11 +2,11 @@ import { useAuth } from "@/context/auth";
 import { ExamContentPayload, ExamStartPayload } from "@/types/exam";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Middleware, mutate, SWRConfiguration, SWRHook } from "swr";
+import { Middleware, SWRConfiguration, SWRHook, mutate } from "swr";
 import useSWR from "swr/immutable";
 import { QuizItem } from "../types";
 import { quizStore, useQuizStoreSync } from "./store";
-import { remoteExam, RemoteExamError } from "./timer";
+import { RemoteExamError, remoteExam } from "./timer";
 
 const axiosFetch = (key: string) => remoteExam.get(key).then((r) => r.data);
 
@@ -74,7 +74,7 @@ const config: SWRConfiguration = {
 
 export const useRemoteExam = ({ payload }: { payload?: ExamStartPayload }) => {
   const { query } = useRouter();
-  const { metadata } = useAuth();
+  const { user } = useAuth();
   const createSWRKey = useCallback(
     (index: number) =>
       payload &&
@@ -89,7 +89,7 @@ export const useRemoteExam = ({ payload }: { payload?: ExamStartPayload }) => {
   const { index } = useQuizStoreSync();
 
   const item = useSWR<QuizItem>(
-    metadata?.exists && index !== 0 && createSWRKey(index),
+    user && index !== 0 && createSWRKey(index),
     axiosFetch,
     config
   );
@@ -105,7 +105,7 @@ export const useRemoteExam = ({ payload }: { payload?: ExamStartPayload }) => {
   }, [index, query.path, payload]);
 
   const content = useSWR<ExamContentPayload>(
-    metadata?.exists && contentFetcher,
+    user && contentFetcher,
     axiosFetch,
     {
       use: [laggy],

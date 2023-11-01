@@ -3,13 +3,13 @@ import { useAuth } from "@/context/auth";
 import { ExamLevel } from "@/types/exam";
 import { DownloadIcon, PrinterIcon } from "@heroicons/react/outline";
 
-import { NextPage } from "next";
-import { useCurrentSubmission } from "@/shared/examList";
-import { useRouter } from "next/router";
-import { formatDateTime } from "@/shared/thaiHelpers";
-import dayjs from "@/shared/dayjs";
-import type { DurationUnitType } from "dayjs/plugin/duration";
 import PieChart from "@/components/PieChart";
+import dayjs from "@/shared/dayjs";
+import { useCurrentSubmission } from "@/shared/examList";
+import { formatDateTime } from "@/shared/thaiHelpers";
+import type { DurationUnitType } from "dayjs/plugin/duration";
+import { NextPage } from "next";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 const units: Partial<Record<DurationUnitType, string>> = {
@@ -85,10 +85,7 @@ const ExamReport: NextPage = () => {
               <h2 className="font-bold text-2xl text-center">ผลการทดสอบ</h2>
               <div className="situation py-4 font-sarabun">
                 <b>ชื่อผู้ทำแบบทดสอบ:</b>
-                <span>
-                  {metadata?.nameTitle}
-                  {metadata?.name}
-                </span>
+                <span>ผู้ใช้งาน DEMO</span>
                 <b>ชื่อชุดสอบ:</b>
                 <span>
                   {submission.subject} - {ExamLevel[submission.level]}

@@ -1,12 +1,11 @@
-import { NextApiHandler } from "next";
-import { ExamStartPayload, GenericExamModel } from "@/types/exam";
-import { nanoid } from "nanoid";
-import { withAPISession } from "@/shared/session";
-import dayjs from "dayjs";
 import { HASH_LENGTH, readFile, withFirebase } from "@/shared/api";
 import { itemToCharCode } from "@/shared/api/item";
 import admin from "@/shared/firebase-admin";
-import { FieldValue } from "firebase-admin/firestore";
+import { withAPISession } from "@/shared/session";
+import { ExamStartPayload, GenericExamModel } from "@/types/exam";
+import dayjs from "dayjs";
+import { nanoid } from "nanoid";
+import { NextApiHandler } from "next";
 
 const db = admin.firestore();
 /**
@@ -48,6 +47,7 @@ const handler: NextApiHandler<ExamStartPayload> = async (req, res) => {
     const segmentsAsHashes = segments.slice(1).map((s) => getOrGenerateHash(s));
     // 1. Read Index File and append to items array
     const root = await readFile<GenericExamModel>(...segments, "index.json");
+    console.log(root);
     if (segments.length === 1) rootExamData = root;
     if (root.items) {
       items = [
@@ -110,6 +110,7 @@ const handler: NextApiHandler<ExamStartPayload> = async (req, res) => {
         uid: req.token.uid,
       },
     };
+    /*
     await db
       .collection("summary")
       .doc("summary")
@@ -123,6 +124,7 @@ const handler: NextApiHandler<ExamStartPayload> = async (req, res) => {
         }
       );
 
+      */
     await req.session.save();
     res.status(200).json({
       // Data is an obfuscated exam payload that can be send to the client safely.

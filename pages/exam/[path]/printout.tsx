@@ -1,26 +1,26 @@
-import { GetServerSideProps } from "next";
-import {
-  ExamLevel,
-  GenericExamModel as BaseExamModel,
-  SubmissionAPIItem,
-} from "@/types/exam";
-import { decodeSegmentsMap, getSubmission, readFile } from "@/shared/api";
-import { useState } from "react";
-import { ChevronLeftIcon, PrinterIcon } from "@heroicons/react/outline";
-import { useHistoryRouter } from "@/context/history";
-import { ContentLoading } from "@/components/quiz/viewer";
-import { useAuth } from "@/context/auth";
-import Head from "next/head";
-import dayjs from "@/shared/dayjs";
 import {
   ExportDataGenerator,
   ExportDataOutput,
   ExportExamModel,
   Result,
 } from "@/components/quiz/export";
-import Image from "next/image";
-import printhead from "../../../public/printhead.jpg";
+import { ContentLoading } from "@/components/quiz/viewer";
+import { useAuth } from "@/context/auth";
+import { useHistoryRouter } from "@/context/history";
+import { decodeSegmentsMap, getSubmission, readFile } from "@/shared/api";
 import { siteName } from "@/shared/constants";
+import dayjs from "@/shared/dayjs";
+import {
+  GenericExamModel as BaseExamModel,
+  ExamLevel,
+  SubmissionAPIItem,
+} from "@/types/exam";
+import { ChevronLeftIcon, PrinterIcon } from "@heroicons/react/outline";
+import { GetServerSideProps } from "next";
+import Head from "next/head";
+import Image from "next/image";
+import { useState } from "react";
+import printhead from "../../../public/printhead.jpg";
 
 type Props = {
   results: Result[];
@@ -159,7 +159,7 @@ export const getServerSideProps: GetServerSideProps<Partial<Props>> = async (
 };
 
 export default function PrintPage({ results, submission, name, admin }: Props) {
-  const { metadata } = useAuth();
+  const { user } = useAuth();
   const [output, setOutput] = useState<Result[]>();
   const { back } = useHistoryRouter();
 
@@ -199,7 +199,7 @@ export default function PrintPage({ results, submission, name, admin }: Props) {
             <ContentLoading />
             <span>กำลังจัดเตรียมไฟล์ กรุณารอสักครู่...</span>
           </div>
-          {metadata?.exists && (
+          {user && (
             <ExportDataGenerator hide results={results} onSuccess={setOutput} />
           )}
         </>

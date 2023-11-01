@@ -1,4 +1,4 @@
-import { withFirebase, readFile, withDocumentDatesParsed } from "@/shared/api";
+import { readFile, withDocumentDatesParsed, withFirebase } from "@/shared/api";
 import admin from "@/shared/firebase-admin";
 import { sessionOptions, withAPISession } from "@/shared/session";
 import {
@@ -26,7 +26,11 @@ const examList: NextApiHandler<ExamListModel> = async (req, res) => {
     const ready = new Map<string, ExamAPIItem>();
     const onProgress: ExamAPIItem[] = [];
     const submission = new Map<string, SubmissionAPIItem>();
-    rawExam.map((v) => ready.set(v.id, { ...v, status: "READY", id: v.id }));
+    rawExam.map((v) => {
+      // @ts-ignore
+      delete v.items;
+      ready.set(v.id, { ...v, status: "READY", id: v.id, count: 10 });
+    });
 
     await Promise.all(
       rawSubmission.docs.map(async (v) => {

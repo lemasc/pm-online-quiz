@@ -1,17 +1,17 @@
 import { useAuth } from "@/context/auth";
-import { ExamListModel, ExamSubmission } from "@/types/exam";
+import { ExamListModel } from "@/types/exam";
 import axios from "axios";
 import { onIdTokenChanged } from "firebase/auth";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { auth } from "./firebase";
 
 export const useExamList = (immutable?: boolean) => {
-  const { user, metadata } = useAuth();
+  const { user } = useAuth();
   const [token, setToken] = useState<string | undefined>();
   const swr = useSWR(
-    metadata?.exists && token && user ? ["/api/exam/list", token] : null,
+    token && user ? ["/api/exam/list", token] : null,
     async (key, token) => {
       const { data } = await axios.get<ExamListModel>(key, {
         headers: {
