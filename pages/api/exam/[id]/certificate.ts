@@ -1,9 +1,9 @@
-import PDFDocument from "pdfkit";
-import { NextApiHandler } from "next";
-import { nanoid } from "nanoid";
+import { getSubmission } from "@/shared/api";
 import { siteName } from "@/shared/constants";
 import { thaiDigits } from "@/shared/thaiHelpers";
-import { getSubmission } from "@/shared/api";
+import { nanoid } from "nanoid";
+import { NextApiHandler } from "next";
+import PDFDocument from "pdfkit";
 import statics from "../../../../statics/index.json";
 
 const file = (name: string) => {
@@ -63,7 +63,7 @@ const certificate: NextApiHandler = async (req, res) => {
       .text(`${metadata.nameTitle}${metadata.name}`, 0, 221, {
         align: "center",
       });
-    doc.font("Bold").fontSize(22).text(subject, 583, 259);
+    doc.font("Bold").fontSize(22).text("ข้อสอบตัวอย่าง", 583, 259);
 
     doc
       .font("Regular")

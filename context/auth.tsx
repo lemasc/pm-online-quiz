@@ -1,7 +1,9 @@
 import {
   GoogleAuthProvider,
   User,
+  browserSessionPersistence,
   getRedirectResult,
+  setPersistence,
   signInWithRedirect,
 } from "firebase/auth";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
@@ -74,6 +76,7 @@ export function useProvideAuth(): IAuthContext {
   }, [router, user]);
 
   useEffect(() => {
+    setPersistence(auth, browserSessionPersistence);
     return auth.onIdTokenChanged(async (curUser) => {
       if (curUser) {
         setUser(curUser);

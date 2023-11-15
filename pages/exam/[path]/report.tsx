@@ -1,7 +1,11 @@
 import Container, { Navbar, withExamName } from "@/components/container";
 import { useAuth } from "@/context/auth";
 import { ExamLevel } from "@/types/exam";
-import { DownloadIcon, PrinterIcon } from "@heroicons/react/outline";
+import {
+  DownloadIcon,
+  PrinterIcon,
+  RefreshIcon,
+} from "@heroicons/react/outline";
 
 import PieChart from "@/components/PieChart";
 import dayjs from "@/shared/dayjs";
@@ -18,7 +22,7 @@ const units: Partial<Record<DurationUnitType, string>> = {
   s: "วินาที",
 };
 
-type Target = "certificate" | "printout";
+type Target = "certificate" | "printout" | "reset";
 
 const ExamReport: NextPage = () => {
   const { metadata } = useAuth();
@@ -67,7 +71,7 @@ const ExamReport: NextPage = () => {
   const goTo = (to: Target) => {
     setTarget((target) => new Set(target).add(to));
     router.push({
-      pathname: `${to === "certificate" ? "/api" : ""}/exam/[path]/${to}`,
+      pathname: `${to !== "printout" ? "/api" : ""}/exam/[path]/${to}`,
       query: {
         path: router.query.path,
         token: submission?.downloadToken,
@@ -146,6 +150,13 @@ const ExamReport: NextPage = () => {
                   ดาวน์โหลดเกียรติบัตร (PDF)
                 </button>
               </div>
+              <button
+                onClick={() => goTo("reset")}
+                className="px-4 py-3 flex flex-row gap-2 justify-center items-center bg-red-500 hover:bg-red-600 disabled:bg-gray-200  disabled:text-gray-500  rounded text-white"
+              >
+                <RefreshIcon className="h-6 w-6" />
+                [DEMO ONLY] ล้างสถานะและทำแบบทดสอบใหม่
+              </button>
             </div>
           </>
         )}

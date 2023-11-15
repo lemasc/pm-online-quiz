@@ -21,7 +21,7 @@ const Card = ({ href, ...props }: Omit<ComponentProps<"a">, "className">) => {
   return (
     <Link href={href as string}>
       <a
-        className="flex flex-col rounded border bg-white hover:bg-gray-100 p-4 gap-1 w-full md:w-72"
+        className="flex flex-col rounded border bg-white hover:bg-gray-100 p-4 gap-1 w-full max-w-md"
         {...props}
       />
     </Link>
